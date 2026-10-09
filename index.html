@@ -1,0 +1,1055 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ananas aus Costa Rica · Klausurtraining</title>
+<meta name="description" content="Klausurtraining Erdkunde: Cash Crops in den Tropen am Beispiel Ananas aus Costa Rica. Acht Stufen mit steigender Schwierigkeit und eine Probeklausur.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+:root{
+  --papier:#f5f1e6; --karte:#fffdf8; --tinte:#22201c; --grau:#6b665c; --linie:rgba(120,112,98,.25);
+  --gruen:#1f5a3d; --gruen2:#2e7d55; --gruenhell:#e3efe6;
+  --gold:#d9a21b; --goldhell:#fbf0d2; --rot:#b5402f; --rothell:#f8e3df; --blau:#2b6ca3; --blauhell:#e2edf6;
+  --grauwasser:#8a8478;
+  --serif: "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --titel: "Fraunces",var(--serif);
+  --radius:14px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--papier);color:var(--tinte);font-family:var(--serif);font-size:18px;line-height:1.6}
+a{color:var(--gruen2)}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:4px}
+button,input,select,textarea{font-family:var(--sans);font-size:16px}
+
+/* Layout */
+.app{display:grid;grid-template-columns:300px 1fr;min-height:100vh}
+aside{position:sticky;top:0;height:100vh;overflow-y:auto;background:var(--gruen);color:#f3efe2;padding:22px 16px 30px;font-family:var(--sans)}
+aside .logo{display:flex;gap:10px;align-items:center;margin-bottom:6px}
+aside .logo svg{flex:none}
+aside h1{font-family:var(--titel);font-size:21px;line-height:1.2;margin:0;font-weight:700}
+aside .sub{font-size:13px;opacity:.75;margin:4px 0 18px}
+.gesamt{background:rgba(255,255,255,.08);border-radius:10px;padding:10px 12px;margin-bottom:16px;font-size:13px}
+.balken{height:8px;background:rgba(255,255,255,.18);border-radius:8px;overflow:hidden;margin-top:6px}
+.balken i{display:block;height:100%;background:var(--gold);width:0;transition:width .4s}
+nav ol{list-style:none;margin:0;padding:0}
+nav li a{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;color:#f3efe2;text-decoration:none;font-size:15px;line-height:1.25;min-height:44px}
+nav li a:hover{background:rgba(255,255,255,.08)}
+nav li a.aktiv{background:#f3efe2;color:var(--gruen)}
+nav .nr{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:13px;background:rgba(255,255,255,.14)}
+nav a.aktiv .nr{background:var(--gold);color:#1d1a12}
+nav .zaehler{margin-left:auto;font-size:12px;opacity:.8;white-space:nowrap}
+nav .gruppe{font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.6;margin:16px 10px 4px}
+main{min-width:0}
+.menu-btn{display:none}
+
+/* Kopf */
+.kopf{position:relative;min-height:300px;display:flex;align-items:flex-end;color:#fff;background:#244b35 center/cover no-repeat;overflow:hidden}
+.kopf::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,35,24,.15) 0%,rgba(15,35,24,.82) 100%)}
+.kopf .inhalt{position:relative;padding:34px 44px;max-width:900px}
+.kopf .stufe{font-family:var(--sans);font-size:13px;letter-spacing:.06em;text-transform:uppercase;background:var(--gold);color:#1d1a12;display:inline-block;padding:4px 10px;border-radius:30px;font-weight:700}
+.kopf h2{font-family:var(--titel);font-size:40px;line-height:1.1;margin:12px 0 6px}
+.kopf p{margin:0;font-size:19px;opacity:.95;max-width:68ch}
+.kopf .ki{position:absolute;right:12px;bottom:8px;font-family:var(--sans);font-size:11px;opacity:.7}
+
+.seite{max-width:920px;margin:0 auto;padding:30px 28px 80px}
+.seite > p, .lesen{max-width:68ch}
+h3{font-family:var(--titel);font-size:27px;margin:38px 0 10px;color:var(--gruen)}
+h4{font-family:var(--sans);font-size:17px;margin:22px 0 8px}
+.karte{background:var(--karte);border:1px solid var(--linie);border-radius:var(--radius);padding:20px 22px;margin:18px 0;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.box{border-left:3px solid var(--gruen2);background:var(--gruenhell);padding:14px 18px;border-radius:0 10px 10px 0;margin:18px 0}
+.box.gold{border-color:var(--gold);background:var(--goldhell)}
+.box.rot{border-color:var(--rot);background:var(--rothell)}
+.box.blau{border-color:var(--blau);background:var(--blauhell)}
+.box h4{margin-top:0}
+.box p:last-child,.box ul:last-child{margin-bottom:0}
+.raster{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+.raster:has(> .diagramm){grid-template-columns:1fr;gap:0}
+figure{margin:20px 0}
+figure img{width:100%;border-radius:var(--radius);display:block}
+figcaption{font-family:var(--sans);font-size:13px;color:var(--grau);margin-top:6px}
+table{border-collapse:collapse;width:100%;font-family:var(--sans);font-size:15px}
+th,td{border-bottom:1px solid var(--linie);padding:7px 8px;text-align:left;vertical-align:top}
+th{background:#efe9da}
+td.z,th.z{text-align:right;font-variant-numeric:tabular-nums}
+.tab-scroll{overflow-x:auto}
+.quelle{font-family:var(--sans);font-size:12px;color:var(--grau);margin-top:8px}
+.mat{font-family:var(--sans);font-weight:700;font-size:13px;color:var(--gruen);letter-spacing:.03em}
+
+/* Übungen */
+.ueb{background:var(--karte);border:1px solid var(--linie);border-radius:var(--radius);padding:18px 20px;margin:18px 0;position:relative}
+.ueb.fertig{border-color:var(--gruen2);box-shadow:inset 4px 0 0 var(--gruen2)}
+.ueb .kopfzeile{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-family:var(--sans);font-size:13px;margin-bottom:8px}
+.badge{padding:3px 9px;border-radius:20px;font-weight:700;font-size:12px}
+.b1{background:#dcefe2;color:#1f5a3d}.b2{background:#fbeccc;color:#7a5a08}.b3{background:#f6dcd6;color:#8b2c1f}.b4{background:#22201c;color:#fff}
+.ueb .frage{font-weight:600;margin:4px 0 10px}
+.optionen{display:grid;gap:8px}
+.opt{display:block;text-align:left;width:100%;padding:11px 14px;border:1.5px solid var(--linie);background:#fff;border-radius:10px;cursor:pointer;min-height:44px;line-height:1.35}
+.opt:hover{border-color:var(--gruen2)}
+.opt.richtig{border-color:var(--gruen2);background:var(--gruenhell)}
+.opt.falsch{border-color:var(--rot);background:var(--rothell)}
+.rueck{font-family:var(--sans);font-size:15px;margin-top:10px;padding:10px 12px;border-radius:8px;display:none}
+.rueck.zeigen{display:block}
+.rueck.ok{background:var(--gruenhell);color:#174a31}
+.rueck.no{background:var(--rothell);color:#7d2416}
+.zeile{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+input[type=text],input[type=number]{padding:9px 11px;border:1.5px solid var(--linie);border-radius:8px;min-height:44px;width:140px;background:#fff}
+select{padding:8px 10px;border:1.5px solid var(--linie);border-radius:8px;min-height:44px;background:#fff;max-width:100%}
+textarea{width:100%;min-height:160px;padding:12px;border:1.5px solid var(--linie);border-radius:10px;background:#fff;line-height:1.5;font-family:var(--serif);font-size:17px}
+.knopf{background:var(--gruen);color:#fff;border:0;border-radius:10px;padding:10px 16px;cursor:pointer;min-height:44px;font-weight:600}
+.knopf:hover{background:var(--gruen2)}
+.knopf.leise{background:transparent;color:var(--gruen);border:1.5px solid var(--gruen)}
+.knopf.leise:hover{background:var(--gruenhell)}
+details.loesung{margin-top:12px;border-left:3px solid var(--gold);background:var(--goldhell);border-radius:0 10px 10px 0;padding:8px 14px}
+details.loesung summary{cursor:pointer;font-family:var(--sans);font-weight:700;font-size:15px;min-height:32px;display:flex;align-items:center}
+.hinweis{font-family:var(--sans);font-size:14px;color:var(--grau)}
+.check li{list-style:none;margin-left:-22px}
+.check label{display:flex;gap:8px;align-items:flex-start;cursor:pointer}
+.check input{margin-top:5px;width:18px;height:18px;flex:none}
+
+/* Sortieren */
+.sortliste{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.sortliste li{display:flex;gap:10px;align-items:center;background:#fff;border:1.5px solid var(--linie);border-radius:10px;padding:8px 10px;line-height:1.35}
+.sortliste li .pf{display:flex;flex-direction:column;gap:2px;flex:none}
+.sortliste li .pf button{border:1px solid var(--linie);background:#f7f3ea;border-radius:6px;width:36px;height:22px;cursor:pointer;font-size:12px;line-height:1}
+.sortliste li.richtig{border-color:var(--gruen2);background:var(--gruenhell)}
+.sortliste li.falsch{border-color:var(--rot);background:var(--rothell)}
+.zuordnen{display:grid;gap:10px}
+.zuordnen .z-zeile{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;background:#fff;border:1.5px solid var(--linie);border-radius:10px;padding:8px 12px;line-height:1.35}
+.zuordnen .z-zeile.richtig{border-color:var(--gruen2);background:var(--gruenhell)}
+.zuordnen .z-zeile.falsch{border-color:var(--rot);background:var(--rothell)}
+.zuordnen .z-zeile .sel{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+
+/* Karteikarten */
+.karteikarten{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.kk{display:block;width:100%;perspective:900px;height:170px;cursor:pointer;border:0;background:none;padding:0;text-align:left}
+.kk .in{display:block;position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.kk.um .in{transform:rotateY(180deg)}
+.kk .vs,.kk .rs{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:12px;padding:14px;display:flex;align-items:center;justify-content:center;text-align:center}
+.kk .vs{background:var(--gruen);color:#fff;font-family:var(--titel);font-size:20px;font-weight:700}
+.kk .rs{background:#fff;border:1.5px solid var(--gruen2);transform:rotateY(180deg);font-size:14.5px;line-height:1.4;font-family:var(--sans);overflow:auto;align-items:flex-start}
+
+/* Fehlerfinder */
+.fehlertext{line-height:2;background:#fff;border:1.5px solid var(--linie);border-radius:10px;padding:14px 16px}
+.fehlertext .ff{border-bottom:2px dotted var(--grau);cursor:pointer;padding:1px 2px;border-radius:4px}
+.fehlertext .ff.markiert{background:var(--goldhell);border-bottom-color:var(--gold)}
+.fehlertext .ff.richtig{background:var(--gruenhell);border-bottom-color:var(--gruen2)}
+.fehlertext .ff.falsch{background:var(--rothell);border-bottom-color:var(--rot)}
+
+/* Diagramme */
+.diagramm{background:#fff;border:1px solid var(--linie);border-radius:var(--radius);padding:14px 14px 8px;margin:16px 0;position:relative}
+.diagramm h5{font-family:var(--sans);font-size:15px;margin:0 0 4px}
+.diagramm > svg{width:100%;height:auto;display:block;overflow:visible}
+.diagramm svg text{font-family:var(--sans);fill:#4a463e}
+.tip{position:absolute;pointer-events:none;background:var(--tinte);color:#fff;font-family:var(--sans);font-size:13px;padding:5px 9px;border-radius:6px;opacity:0;transition:opacity .15s;white-space:nowrap;z-index:5}
+.legende{display:flex;flex-wrap:wrap;gap:14px;font-family:var(--sans);font-size:13px;color:#4a463e;margin:6px 0}
+.legende span::before{content:"";display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px;background:var(--c)}
+.umschalter{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 2px}
+.umschalter button{border:1.5px solid var(--linie);background:#fff;border-radius:20px;padding:6px 12px;cursor:pointer;min-height:36px}
+.umschalter button.an{background:var(--gruen);color:#fff;border-color:var(--gruen)}
+
+/* Karte */
+#karte,#karte2{height:540px;border-radius:var(--radius);border:1px solid var(--linie);z-index:1}
+.koord{font-family:var(--sans);font-size:14px;margin-top:6px;color:var(--grau)}
+.leaflet-tooltip.lbl{background:rgba(255,253,248,.92);border:1px solid var(--linie);font-family:var(--sans);font-size:12px;font-weight:600;color:var(--tinte);box-shadow:none}
+.leaflet-tooltip.zone{background:rgba(154,107,0,.88);color:#fff;border:0;text-align:center}
+.leaflet-tooltip.zone::before{display:none}
+.grad-lbl{font-family:var(--sans);font-size:11px;color:#3a5a78;font-weight:700;white-space:nowrap;text-shadow:0 0 3px #fff,0 0 3px #fff}
+
+/* Dreieck */
+.dreieck-wrap{display:grid;grid-template-columns:minmax(220px,320px) 1fr;gap:20px;align-items:start}
+.karte-satz{display:grid;grid-template-columns:1fr;gap:6px;background:#fff;border:1.5px solid var(--linie);border-radius:10px;padding:10px 12px;line-height:1.35}
+.karte-satz .sel{display:flex;gap:6px;flex-wrap:wrap}
+.karte-satz.richtig{border-color:var(--gruen2);background:var(--gruenhell)}
+.karte-satz.falsch{border-color:var(--rot);background:var(--rothell)}
+
+/* Weg der Ananas */
+.weg svg{width:100%;height:auto}
+.weg .schritt{font-family:var(--sans);font-size:14px}
+
+/* Probeklausur */
+.timer{position:sticky;top:10px;z-index:20;display:flex;gap:10px;align-items:center;justify-content:flex-end;font-family:var(--sans)}
+.timer .uhr{background:var(--tinte);color:#fff;border-radius:10px;padding:8px 14px;font-variant-numeric:tabular-nums;font-weight:700;font-size:18px}
+.punkte{font-family:var(--sans);font-weight:700;color:var(--gruen)}
+.ew td:last-child,.ew th:last-child{text-align:center;width:70px}
+.ew input{width:20px;height:20px}
+.navknoepfe{display:flex;justify-content:space-between;gap:10px;margin-top:40px;flex-wrap:wrap}
+
+.leiter{display:grid;gap:10px;margin:18px 0}
+.leiter a{display:grid;grid-template-columns:48px 1fr auto;gap:14px;align-items:center;text-decoration:none;color:inherit;background:var(--karte);border:1px solid var(--linie);border-radius:12px;padding:10px 14px}
+.leiter a:hover{border-color:var(--gruen2)}
+.leiter .stu{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font-family:var(--titel);font-weight:700;font-size:22px;color:#fff}
+.leiter b{font-family:var(--sans);display:block;font-size:16px}
+.leiter small{font-family:var(--sans);color:var(--grau);font-size:13px}
+
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  aside{position:fixed;inset:0 auto 0 0;width:min(320px,86vw);z-index:1000;transform:translateX(-102%);transition:transform .25s;box-shadow:4px 0 20px rgba(0,0,0,.3)}
+  aside.offen{transform:none}
+  .menu-btn{display:flex;position:fixed;left:12px;top:12px;z-index:1001;background:var(--gruen);color:#fff;border:0;border-radius:10px;width:46px;height:46px;align-items:center;justify-content:center;font-size:22px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+  .kopf .inhalt{padding:70px 16px 24px}
+  .kopf h2{font-size:30px}
+  .seite{padding:22px 16px 70px}
+  .dreieck-wrap{grid-template-columns:1fr}
+  #karte,#karte2{height:380px}
+  body{font-size:17px}
+}
+@media print{
+  aside,.menu-btn,.timer,.navknoepfe,.knopf{display:none!important}
+  .app{display:block}
+  details{display:block} details>*{display:block}
+  .kopf{min-height:auto;color:#000;background:none!important}.kopf::before{display:none}
+}
+</style>
+</head>
+<body>
+<button class="menu-btn" aria-label="Menü öffnen" onclick="document.querySelector('aside').classList.toggle('offen')">☰</button>
+<div class="app">
+<aside>
+  <div class="logo">
+    <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><path d="M20 3c-2 4-1 8 0 10 1-3 4-6 8-7-3 3-4 5-4 8 2-2 5-3 8-2-4 1-6 3-7 5h-10c-1-2-3-4-7-5 3-1 6 0 8 2 0-3-1-5-4-8 4 1 7 4 8 7 1-2 2-6 0-10z" fill="#7cc48f"/><ellipse cx="20" cy="27" rx="9" ry="11" fill="#e3b23c"/><path d="M13 21l14 12M13 27l11 9M16 18l12 10M27 21L13 33M27 27l-11 9M24 18L12 28" stroke="#a8761a" stroke-width="1.2"/></svg>
+    <h1>Ananas aus<br>Costa Rica</h1>
+  </div>
+  <div class="sub">Klausurtraining Erdkunde · Cash Crops in den Tropen</div>
+  <div class="gesamt"><span id="gesamtText">0 von 0 Aufgaben gelöst</span><div class="balken"><i id="gesamtBalken"></i></div></div>
+  <nav><ol id="navliste"></ol></nav>
+</aside>
+<main id="main"></main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+"use strict";
+/* ============ Daten ============ */
+const D = {
+  produktion: [ // FAOSTAT, t
+    [1990,423500],[2000,903125],[2010,2312733],[2016,2923158],[2017,3317028],[2018,3418155],[2019,2802712],[2020,2648138],[2021,2938334],[2022,2909750]
+  ],
+  flaeche: [[2000,11000],[2014,36000],[2016,43000],[2018,44500]], // ha, CANAPEP/INEC nach Fruitrop 2019
+  exportwert: [[2010,677],[2014,889],[2016,905],[2018,1040],[2019,982],[2022,1038],[2023,1176]], // Mio US$, UN-Comtrade-Daten nach Tridge u. a.
+  welt2022: 29361138,
+  laender2022: [["Indonesien",3203775],["Philippinen",2914425],["Costa Rica",2909750],["Brasilien",2337302],["China",1960000],["Indien",1851000],["Thailand",1714213],["Nigeria",1607200],["Mexiko",1247593],["Kolumbien",919709]],
+  losChiles: {name:"Los Chiles (43 m ü. NN)", lage:"10°58′ N / 84°36′ W", T:[25.4,25.7,26.5,27.6,27.8,27.4,26.9,27.2,27.5,27.3,26.4,25.7], N:[85.5,41.1,29.0,42.4,163.1,222.6,262.0,217.0,194.1,198.3,147.7,117.0]},
+  liberia: {name:"Liberia (144 m ü. NN)", lage:"10°38′ N / 85°26′ W", T:[25.8,26.7,27.3,28.5,28.7,28.0,27.6,27.0,27.2,27.0,26.2,25.7], N:[1.3,1.6,4.1,23.9,194.1,245.6,153.3,209.4,346.3,310.0,98.2,12.3]},
+  exporte: [["Medizinprodukte",42.1],["Bananen",6.5],["Ananas",6.4],["Sirupe, Konzentrate",3.6],["Kaffee",1.9],["Übrige Güter",39.5]],
+  abnehmer: [["USA",50,"#2b6ca3"],["EU",44,"#d9a21b"],["Russland",2,"#8a8478"],["Mittel- und Südamerika",2,"#2e7d55"],["Sonstige",2,"#c9c2b2"]],
+  firmen: [["Del Monte (Pindeco)",40],["Dole",20],["Grupo Acon",8],["Fyffes",3],["246 weitere Betriebe",29]],
+  wasser: [ // Mekonnen & Hoekstra 2011, m³/t, weltweiter Durchschnitt
+    ["Zuckerrohr",139,57,13],["Ananas",215,9,31],["Orange",401,110,49],["Banane",660,97,33],["Kaffee (Rohbohne)",15249,116,532],["Kakao (Bohne)",19745,4,179]
+  ]
+};
+const MON = ["J","F","M","A","M","J","J","A","S","O","N","D"];
+const fmt = (x,d=0)=>Number(x).toLocaleString("de-DE",{minimumFractionDigits:d,maximumFractionDigits:d});
+
+/* ============ Fortschritt ============ */
+const SPEICHER="ananas-cr";
+function lade(k,def){try{const v=localStorage.getItem(SPEICHER+"-"+k);return v===null?def:JSON.parse(v)}catch(e){return def}}
+function sichere(k,v){try{localStorage.setItem(SPEICHER+"-"+k,JSON.stringify(v))}catch(e){}}
+let erledigt = lade("erledigt",{});
+function markiere(id){ if(!erledigt[id]){erledigt[id]=true;sichere("erledigt",erledigt);} const el=document.querySelector(`[data-ueb="${id}"]`); if(el) el.classList.add("fertig"); zaehle(); }
+
+/* ============ Themen ============ */
+const THEMEN = [
+ {id:"start", nr:"★", titel:"Start", gruppe:"Einstieg", stufe:"Überblick", bild:"hero", unter:"Klausurtraining am Beispiel Ananas aus Costa Rica: Schritt für Schritt vom Grundwissen bis zum Urteil."},
+ {id:"operatoren", nr:"1", titel:"Operatoren verstehen", gruppe:"Grundlagen", stufe:"Stufe 1 · AFB I–III", bild:"pflanze", unter:"Was heißt einordnen, beschreiben, erläutern, beurteilen? Wer das weiß, verschenkt keine Punkte."},
+ {id:"begriffe", nr:"2", titel:"Fachbegriffe", gruppe:"Grundlagen", stufe:"Stufe 2 · AFB I", bild:"pflanze", unter:"Cash Crop, Monokultur, Landgrabbing, Wasserfußabdruck: Die Wörter, die in jeder Antwort vorkommen sollten."},
+ {id:"verorten", nr:"3", titel:"Raum einordnen", gruppe:"Material auswerten", stufe:"Stufe 3 · AFB I", bild:"hero", unter:"Gradnetz, Relief, Nachbarn, Häfen: Wo genau wächst die Ananas, und warum gerade dort?"},
+ {id:"klima", nr:"4", titel:"Klima und Ansprüche", gruppe:"Material auswerten", stufe:"Stufe 4 · AFB I/II", bild:"pflanze", unter:"Klimadiagramme lesen und mit den Ansprüchen einer Nutzpflanze abgleichen."},
+ {id:"statistik", nr:"5", titel:"Entwicklung beschreiben", gruppe:"Material auswerten", stufe:"Stufe 5 · AFB I/II", bild:"regenwald", unter:"Diagramme und Tabellen genau beschreiben: Zeitraum, Werte, Trend, Ausreißer."},
+ {id:"wirtschaft", nr:"6", titel:"Wirtschaftliche Bedeutung", gruppe:"Zusammenhänge", stufe:"Stufe 6 · AFB II", bild:"packstation", unter:"Länderdaten, Exportstruktur, Abnehmer: Erläutern, was die Ananas für Costa Rica bedeutet."},
+ {id:"umwelt", nr:"7", titel:"Wasser, Umwelt, Menschen", gruppe:"Zusammenhänge", stufe:"Stufe 7 · AFB II", bild:"tankwagen", unter:"Wasserfußabdruck, Pestizide, Entwaldung, Arbeitsbedingungen: die Folgen des Booms."},
+ {id:"beurteilen", nr:"8", titel:"Nachhaltigkeit beurteilen", gruppe:"Urteilen", stufe:"Stufe 8 · AFB III", bild:"regenwald", unter:"Mit dem Dreieck der Nachhaltigkeit zu einem begründeten Urteil kommen."},
+ {id:"probeklausur", nr:"✎", titel:"Probeklausur", gruppe:"Urteilen", stufe:"Transfer · AFB I–III", bild:"hero", unter:"Drei Aufgaben, 135 Minuten, mit Erwartungshorizont zur Selbstkontrolle."},
+ {id:"quellen", nr:"i", titel:"Quellen und Bilder", gruppe:"Anhang", stufe:"Anhang", bild:"hafen", unter:"Woher die Zahlen stammen und wie die Bilder entstanden sind."}
+];
+const BILDER = {hero:"bilder/hero.webp",pflanze:"bilder/pflanze.webp",regenwald:"bilder/regenwald.webp",packstation:"bilder/packstation.webp",hafen:"bilder/hafen.webp",tankwagen:"bilder/tankwagen.webp"};
+
+/* Übungs-Registry: id -> Thema */
+const UEB = {}; // wird beim Rendern befüllt; Gesamtzahl steht fest:
+const ALLE_UEB = {};
+
+/* ============ Bausteine für Übungen ============ */
+const NIVEAU = {1:["basal","b1"],2:["mittel","b2"],3:["anspruchsvoll","b3"],4:["Klausurniveau","b4"]};
+function kopf(n,afb){const [t,c]=NIVEAU[n];return `<div class="kopfzeile"><span class="badge ${c}">${t}</span>${afb?`<span class="hinweis">${afb}</span>`:""}</div>`}
+
+function mc(id,n,frage,opts,richtig,erkl,afb){
+  // opts: Array von Strings; richtig: Index
+  reg(id);
+  return `<div class="ueb" data-ueb="${id}">${kopf(n,afb)}<div class="frage">${frage}</div>
+  <div class="optionen">${opts.map((o,i)=>`<button class="opt" data-i="${i}" onclick="mcKlick(this,'${id}',${richtig})">${o}</button>`).join("")}</div>
+  <div class="rueck" id="r-${id}"></div><template id="e-${id}">${erkl}</template></div>`;
+}
+function mcKlick(btn,id,richtig){
+  const box=btn.closest(".ueb"); const i=+btn.dataset.i; const r=document.getElementById("r-"+id);
+  box.querySelectorAll(".opt").forEach(b=>b.classList.remove("richtig","falsch"));
+  if(i===richtig){btn.classList.add("richtig");r.className="rueck zeigen ok";r.innerHTML="Richtig. "+document.getElementById("e-"+id).innerHTML;markiere(id);}
+  else{btn.classList.add("falsch");r.className="rueck zeigen no";r.innerHTML="Noch nicht. Lies die Frage noch einmal genau und versuche es erneut.";}
+}
+
+function num(id,n,frage,soll,tol,einheit,erkl,afb){
+  reg(id);
+  return `<div class="ueb" data-ueb="${id}">${kopf(n,afb)}<div class="frage">${frage}</div>
+  <div class="zeile"><input type="text" inputmode="decimal" id="i-${id}" aria-label="Antwort" onkeydown="if(event.key==='Enter')numPruef('${id}',${soll},${tol})"> <span>${einheit}</span>
+  <button class="knopf" onclick="numPruef('${id}',${soll},${tol})">Prüfen</button></div>
+  <div class="rueck" id="r-${id}"></div><template id="e-${id}">${erkl}</template></div>`;
+}
+function numPruef(id,soll,tol){
+  const roh=document.getElementById("i-"+id).value.trim().replace(/\s/g,"").replace(/\.(?=\d{3}(\D|$))/g,"").replace(",",".");
+  const v=parseFloat(roh); const r=document.getElementById("r-"+id);
+  if(isNaN(v)){r.className="rueck zeigen no";r.textContent="Bitte eine Zahl eingeben.";return;}
+  if(Math.abs(v-soll)<=tol){r.className="rueck zeigen ok";r.innerHTML="Richtig. "+document.getElementById("e-"+id).innerHTML;markiere(id);}
+  else{r.className="rueck zeigen no";r.innerHTML=(v>soll?"Zu groß.":"Zu klein.")+" Prüfe deinen Ansatz. <details class='loesung'><summary>Lösungsweg zeigen</summary>"+document.getElementById("e-"+id).innerHTML+"</details>";}
+}
+
+function ordnen(id,n,frage,items,erkl,afb){
+  // items in richtiger Reihenfolge; Anzeige gemischt
+  reg(id);
+  const gemischt=mische(items.map((t,i)=>({t,i})),id);
+  return `<div class="ueb" data-ueb="${id}">${kopf(n,afb)}<div class="frage">${frage}</div>
+  <ol class="sortliste" id="s-${id}">${gemischt.map(o=>`<li data-i="${o.i}"><span class="pf"><button aria-label="nach oben" onclick="schiebe(this,-1)">▲</button><button aria-label="nach unten" onclick="schiebe(this,1)">▼</button></span><span>${o.t}</span></li>`).join("")}</ol>
+  <div class="zeile" style="margin-top:10px"><button class="knopf" onclick="ordnenPruef('${id}')">Reihenfolge prüfen</button></div>
+  <div class="rueck" id="r-${id}"></div><template id="e-${id}">${erkl}</template></div>`;
+}
+function schiebe(b,d){const li=b.closest("li");const ul=li.parentNode;ul.querySelectorAll("li").forEach(x=>x.classList.remove("richtig","falsch"));
+  if(d<0&&li.previousElementSibling)ul.insertBefore(li,li.previousElementSibling);
+  if(d>0&&li.nextElementSibling)ul.insertBefore(li.nextElementSibling,li);
+  b.focus();}
+function ordnenPruef(id){
+  const lis=[...document.querySelectorAll(`#s-${id} li`)];let ok=0;
+  lis.forEach((li,pos)=>{const r=+li.dataset.i===pos;li.classList.toggle("richtig",r);li.classList.toggle("falsch",!r);if(r)ok++;});
+  const r=document.getElementById("r-"+id);
+  if(ok===lis.length){r.className="rueck zeigen ok";r.innerHTML="Alles in der richtigen Reihenfolge. "+document.getElementById("e-"+id).innerHTML;markiere(id);}
+  else{r.className="rueck zeigen no";r.textContent=`${ok} von ${lis.length} Karten stehen richtig. Verschiebe die roten Karten.`;}
+}
+
+function zuordnen(id,n,frage,zeilen,kategorien,erkl,afb){
+  // zeilen: [[text, richtigeKategorie]]
+  reg(id);
+  return `<div class="ueb" data-ueb="${id}">${kopf(n,afb)}<div class="frage">${frage}</div>
+  <div class="zuordnen" id="z-${id}">${zeilen.map((z,i)=>`<div class="z-zeile" data-soll="${z[1]}"><span>${z[0]}</span><span class="sel"><select aria-label="Zuordnung"><option value="">wählen …</option>${kategorien.map(k=>`<option>${k}</option>`).join("")}</select></span></div>`).join("")}</div>
+  <div class="zeile" style="margin-top:10px"><button class="knopf" onclick="zuordnenPruef('${id}')">Prüfen</button></div>
+  <div class="rueck" id="r-${id}"></div><template id="e-${id}">${erkl}</template></div>`;
+}
+function zuordnenPruef(id){
+  const zz=[...document.querySelectorAll(`#z-${id} .z-zeile`)];let ok=0;
+  zz.forEach(z=>{const v=z.querySelector("select").value;const r=v===z.dataset.soll;z.classList.toggle("richtig",r);z.classList.toggle("falsch",!r);if(r)ok++;});
+  const r=document.getElementById("r-"+id);
+  if(ok===zz.length){r.className="rueck zeigen ok";r.innerHTML="Alles richtig zugeordnet. "+document.getElementById("e-"+id).innerHTML;markiere(id);}
+  else{r.className="rueck zeigen no";r.textContent=`${ok} von ${zz.length} richtig. Prüfe die rot markierten Zeilen.`;}
+}
+
+function schreib(id,n,frage,check,loesung,afb,hoehe){
+  // Freitext mit Selbstcheck; gilt als erledigt, wenn alle Haken gesetzt
+  reg(id);
+  const text=lade("text-"+id,"");
+  return `<div class="ueb" data-ueb="${id}">${kopf(n,afb)}<div class="frage">${frage}</div>
+  <textarea id="t-${id}" style="min-height:${hoehe||170}px" placeholder="Schreibe hier deine Antwort. Sie wird in diesem Browser gespeichert." oninput="sichere('text-${id}',this.value)">${text.replace(/</g,"&lt;")}</textarea>
+  <details class="loesung"><summary>Selbstcheck und Musterlösung</summary>
+  <p class="hinweis">Vergleiche deine Antwort. Hake ab, was du drin hast. Sind alle Haken gesetzt, zählt die Aufgabe als gelöst.</p>
+  <ul class="check">${check.map((c,i)=>`<li><label><input type="checkbox" onchange="schreibPruef('${id}')"> <span>${c}</span></label></li>`).join("")}</ul>
+  <h4>Musterlösung</h4><div class="lesen">${loesung}</div></details></div>`;
+}
+function schreibPruef(id){const cb=[...document.querySelectorAll(`[data-ueb="${id}"] .check input`)];if(cb.every(c=>c.checked))markiere(id);}
+
+function fehler(id,n,frage,teile,erkl,afb){
+  // teile: Strings oder [text, istFehler, korrektur]
+  reg(id);
+  let html=teile.map((t,i)=>typeof t==="string"?t:`<span class="ff" data-f="${t[1]?1:0}" data-k="${(t[2]||"").replace(/"/g,"&quot;")}" tabindex="0" role="button" onclick="this.classList.toggle('markiert')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.classList.toggle('markiert')}">${t[0]}</span>`).join("");
+  return `<div class="ueb" data-ueb="${id}">${kopf(n,afb)}<div class="frage">${frage}</div>
+  <div class="fehlertext" id="f-${id}">${html}</div>
+  <div class="zeile" style="margin-top:10px"><button class="knopf" onclick="fehlerPruef('${id}')">Prüfen</button></div>
+  <div class="rueck" id="r-${id}"></div><template id="e-${id}">${erkl}</template></div>`;
+}
+function fehlerPruef(id){
+  const sp=[...document.querySelectorAll(`#f-${id} .ff`)];let treffer=0,falschM=0,ges=0;let korr=[];
+  sp.forEach(s=>{const f=s.dataset.f==="1",m=s.classList.contains("markiert");s.classList.remove("richtig","falsch");
+    if(f){ges++; if(m){treffer++;s.classList.add("richtig");korr.push(`<li><b>${s.textContent}</b>: ${s.dataset.k}</li>`);} }
+    else if(m){falschM++;s.classList.add("falsch");}});
+  const r=document.getElementById("r-"+id);
+  if(treffer===ges&&falschM===0){r.className="rueck zeigen ok";r.innerHTML=`Alle ${ges} Fehler gefunden.<ul>${korr.join("")}</ul>`+document.getElementById("e-"+id).innerHTML;markiere(id);}
+  else{r.className="rueck zeigen no";r.innerHTML=`${treffer} von ${ges} Fehlern gefunden${falschM?`, ${falschM} Stelle(n) markiert, die stimmen`:""}. Rot markierte Stellen sind korrekt, grüne sind echte Fehler.`;}
+}
+
+function reg(id){UEB[id]=aktuellesThema;}
+function mische(arr,seed){let s=[...seed].reduce((a,c)=>a*31+c.charCodeAt(0)|0,7);const a=arr.slice();for(let i=a.length-1;i>0;i--){s=(s*1103515245+12345)&0x7fffffff;const j=s%(i+1);[a[i],a[j]]=[a[j],a[i]];}
+  if(a.every((x,i)=>x.i===i)&&a.length>1)[a[0],a[1]]=[a[1],a[0]];return a;}
+
+/* ============ Diagramme (SVG) ============ */
+const NS="http://www.w3.org/2000/svg";
+function svgEl(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+function tipp(container){let t=container.querySelector(".tip");if(!t){t=document.createElement("div");t.className="tip";container.appendChild(t);}return {
+  zeig(html,x,y){t.innerHTML=html;t.style.opacity=1;const w=t.offsetWidth;let l=x+12;if(l+w>container.clientWidth-4)l=x-w-12;t.style.left=Math.max(4,l)+"px";t.style.top=(y-34)+"px";},
+  weg(){t.style.opacity=0;}};}
+function mausPos(e,cont){const r=cont.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top];}
+
+function klimadiagramm(el,K){
+  const W=520,H=360,L=50,R=56,T=34,B=40; const pw=W-L-R, ph=H-T-B;
+  const maxU=Math.max(60, Math.ceil(Math.max(...K.N.map(n=>n<=100?n/2:50+(n-100)/20))/10)*10);
+  const yU=u=>T+ph-(u/maxU)*ph; const yN=n=>yU(n<=100?n/2:50+(n-100)/20); const yT=t=>yU(t);
+  const svg=svgEl("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":"Klimadiagramm "+K.name,style:"max-width:580px;margin:0 auto"});
+  const g=svgEl("g",{},svg);
+  // Gitter + Achsen
+  for(let u=0;u<=maxU;u+=10){const y=yU(u);svgEl("line",{x1:L,x2:L+pw,y1:y,y2:y,stroke:"rgba(120,112,98,.18)"},g);
+    if(u<=50){svgEl("text",{x:L-8,y:y+4,"text-anchor":"end","font-size":12},g).textContent=u;}
+    const mm=u<=50?u*2:100+(u-50)*20; svgEl("text",{x:L+pw+8,y:y+4,"font-size":12},g).textContent=mm;}
+  svgEl("text",{x:L-8,y:T-14,"text-anchor":"end","font-size":12,"font-weight":700,fill:"#b5402f"},g).textContent="°C";
+  svgEl("text",{x:L+pw+8,y:T-14,"font-size":12,"font-weight":700,fill:"#2b6ca3"},g).textContent="mm";
+  const bw=pw/12;
+  // aride Monate markieren
+  K.N.forEach((n,i)=>{ if(n<2*K.T[i]) svgEl("rect",{x:L+i*bw,y:T,width:bw,height:ph,fill:"rgba(217,162,27,.13)"},g); });
+  // Niederschlagssäulen
+  K.N.forEach((n,i)=>{const y=yN(n);const r=svgEl("rect",{x:L+i*bw+bw*.18,y,width:bw*.64,height:T+ph-y,fill:n>100?"#1d4f7c":"#5b95c7",rx:2},g);});
+  // Temperaturkurve
+  const pts=K.T.map((t,i)=>`${L+i*bw+bw/2},${yT(t)}`).join(" ");
+  svgEl("polyline",{points:pts,fill:"none",stroke:"#b5402f","stroke-width":2.6,"stroke-linejoin":"round"},g);
+  K.T.forEach((t,i)=>svgEl("circle",{cx:L+i*bw+bw/2,cy:yT(t),r:3,fill:"#b5402f"},g));
+  MON.forEach((m,i)=>{svgEl("text",{x:L+i*bw+bw/2,y:T+ph+18,"text-anchor":"middle","font-size":12},g).textContent=m;});
+  svgEl("line",{x1:L,x2:L+pw,y1:T+ph,y2:T+ph,stroke:"#4a463e"},g);
+  // Kopfzeile
+  const sumN=K.N.reduce((a,b)=>a+b,0), mT=K.T.reduce((a,b)=>a+b,0)/12;
+  svgEl("text",{x:L,y:14,"font-size":13,"font-weight":700},g).textContent=K.name;
+  svgEl("text",{x:L+pw,y:14,"text-anchor":"end","font-size":12},g).textContent=K.lage;
+  el.innerHTML=`<div class="legende"><span style="--c:#5b95c7">Niederschlag bis 100 mm</span><span style="--c:#1d4f7c">über 100 mm (Maßstab 1:10 verkürzt)</span><span style="--c:#b5402f">Temperatur</span><span style="--c:rgba(217,162,27,.4)">arider Monat</span></div>`;
+  el.appendChild(svg);
+  // Hover
+  const tp=tipp(el); const hit=svgEl("rect",{x:L,y:T,width:pw,height:ph,fill:"transparent"},g);
+  hit.addEventListener("mousemove",e=>{const [mx,my]=mausPos(e,el);const sx=W/svg.getBoundingClientRect().width;const i=Math.min(11,Math.max(0,Math.floor(((e.clientX-svg.getBoundingClientRect().left)*sx-L)/bw)));
+    tp.zeig(`<b>${["Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember"][i]}</b>: ${fmt(K.T[i],1)} °C · ${fmt(K.N[i],1)} mm`,mx,my);});
+  hit.addEventListener("mouseleave",()=>tp.weg());
+  el.dataset.summen=`${sumN}|${mT}`;
+}
+
+function linien(el,opt){
+  // opt: {daten:[[x,y]], yMax, yEinheit, xTicks, farbe, label, fmtY}
+  const W=640,H=320,L=64,R=20,T=20,B=36,pw=W-L-R,ph=H-T-B;
+  const xs=opt.daten.map(d=>d[0]);const x0=opt.xMin??Math.min(...xs),x1=opt.xMax??Math.max(...xs);
+  const X=x=>L+(x-x0)/(x1-x0)*pw, Y=y=>T+ph-(y/opt.yMax)*ph;
+  const svg=svgEl("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":opt.label,style:"max-width:720px;margin:0 auto"});
+  for(let i=0;i<=opt.ySchritte;i++){const v=opt.yMax/opt.ySchritte*i;const y=Y(v);svgEl("line",{x1:L,x2:L+pw,y1:y,y2:y,stroke:"rgba(120,112,98,.18)"},svg);
+    svgEl("text",{x:L-8,y:y+4,"text-anchor":"end","font-size":12},svg).textContent=opt.fmtY(v);}
+  (opt.xTicks||xs).forEach(x=>{svgEl("text",{x:X(x),y:T+ph+20,"text-anchor":"middle","font-size":12},svg).textContent=x;});
+  svgEl("line",{x1:L,x2:L+pw,y1:T+ph,y2:T+ph,stroke:"#4a463e"},svg);
+  if(opt.flaeche){const p=`M${X(opt.daten[0][0])},${Y(0)} `+opt.daten.map(d=>`L${X(d[0])},${Y(d[1])}`).join(" ")+` L${X(opt.daten.at(-1)[0])},${Y(0)} Z`;svgEl("path",{d:p,fill:opt.farbe,opacity:.12},svg);}
+  svgEl("polyline",{points:opt.daten.map(d=>`${X(d[0])},${Y(d[1])}`).join(" "),fill:"none",stroke:opt.farbe,"stroke-width":2.6,"stroke-linejoin":"round"},svg);
+  const tp=tipp(el);
+  opt.daten.forEach(d=>{const c=svgEl("circle",{cx:X(d[0]),cy:Y(d[1]),r:5,fill:"#fff",stroke:opt.farbe,"stroke-width":2.4,tabindex:0},svg);
+    const zeig=e=>{const r=el.getBoundingClientRect(),cr=c.getBoundingClientRect();tp.zeig(`<b>${d[0]}</b>: ${opt.fmtTip(d[1])}`,cr.left-r.left+cr.width/2,cr.top-r.top);c.setAttribute("r",7);};
+    c.addEventListener("mouseenter",zeig);c.addEventListener("focus",zeig);c.addEventListener("mouseleave",()=>{tp.weg();c.setAttribute("r",5)});c.addEventListener("blur",()=>{tp.weg();c.setAttribute("r",5)});});
+  if(opt.y2Label)svgEl("text",{x:L,y:12,"font-size":12,"font-weight":700},svg).textContent=opt.y2Label;
+  el.appendChild(svg);
+}
+
+function balken(el,opt){
+  // horizontale Balken: opt.daten [[label,wert,farbe?]], opt.max, opt.fmt, opt.hervor (label)
+  const zeilenH=34,L=opt.L||170,R=70,W=640,H=opt.daten.length*zeilenH+10;
+  const svg=svgEl("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":opt.label,style:"max-width:720px"});
+  const pw=W-L-R;
+  opt.daten.forEach((d,i)=>{const y=i*zeilenH+6;const w=Math.max(2,d[1]/opt.max*pw);
+    svgEl("text",{x:L-10,y:y+17,"text-anchor":"end","font-size":13,"font-weight":d[0]===opt.hervor?700:400},svg).textContent=d[0];
+    const r=svgEl("rect",{x:L,y,width:0,height:22,rx:3,fill:d[2]||(d[0]===opt.hervor?"#d9a21b":"#2e7d55")},svg);
+    requestAnimationFrame(()=>{r.style.transition="width .7s ease";r.setAttribute("width",w);});
+    svgEl("text",{x:L+w+8,y:y+16,"font-size":13},svg).textContent=opt.fmt(d[1]);});
+  el.appendChild(svg);
+}
+
+function donut(el,daten,label){
+  const W=360,H=240,cx=120,cy=120,r=95,ri=58;const sum=daten.reduce((a,d)=>a+d[1],0);
+  const svg=svgEl("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":label,style:"max-width:480px"});let a=-Math.PI/2;const tp=tipp(el);
+  daten.forEach(d=>{const w=d[1]/sum*2*Math.PI;const a2=a+w;const gross=w>Math.PI?1:0;
+    const p=`M${cx+r*Math.cos(a)},${cy+r*Math.sin(a)} A${r},${r} 0 ${gross} 1 ${cx+r*Math.cos(a2)},${cy+r*Math.sin(a2)} L${cx+ri*Math.cos(a2)},${cy+ri*Math.sin(a2)} A${ri},${ri} 0 ${gross} 0 ${cx+ri*Math.cos(a)},${cy+ri*Math.sin(a)} Z`;
+    const s=svgEl("path",{d:p,fill:d[2],stroke:"#fff","stroke-width":2},svg);
+    s.addEventListener("mousemove",e=>{const [x,y]=mausPos(e,el);tp.zeig(`<b>${d[0]}</b>: ${d[1]} %`,x,y)});s.addEventListener("mouseleave",()=>tp.weg());a=a2;});
+  svgEl("text",{x:cx,y:cy-2,"text-anchor":"middle","font-size":13,"font-weight":700},svg).textContent="Exporte";
+  svgEl("text",{x:cx,y:cy+16,"text-anchor":"middle","font-size":12},svg).textContent="2017";
+  daten.forEach((d,i)=>{const y=40+i*26;svgEl("rect",{x:240,y:y-11,width:13,height:13,rx:3,fill:d[2]},svg);svgEl("text",{x:260,y,"font-size":13},svg).textContent=`${d[0]} ${d[1]} %`;});
+  el.appendChild(svg);
+}
+
+function wasserDiagramm(el,modus){
+  el.querySelectorAll("svg,.tip").forEach(x=>x.remove());
+  const daten=D.wasser.map(d=>({n:d[0],g:d[1],b:d[2],gr:d[3],s:d[1]+d[2]+d[3]})).filter(d=>modus==="alle"||d.s<2000);
+  const max=Math.max(...daten.map(d=>d.s));const L=150,R=80,W=640,zh=36,H=daten.length*zh+30,pw=W-L-R;
+  const svg=svgEl("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":"Wasserfußabdruck nach Anbaufrucht",style:"max-width:760px"});const tp=tipp(el);
+  daten.forEach((d,i)=>{const y=i*zh+6;let x=L;
+    svgEl("text",{x:L-10,y:y+17,"text-anchor":"end","font-size":13,"font-weight":d.n==="Ananas"?700:400},svg).textContent=d.n;
+    [["grün",d.g,"#2e7d55"],["blau",d.b,"#2b6ca3"],["grau",d.gr,"#8a8478"]].forEach(([k,v,c])=>{const w=v/max*pw;const r=svgEl("rect",{x,y,width:Math.max(w,0.5),height:22,fill:c},svg);
+      r.addEventListener("mousemove",e=>{const [mx,my]=mausPos(e,el);tp.zeig(`<b>${d.n}</b>, ${k}: ${fmt(v)} m³/t (${fmt(v/d.s*100,1)} %)`,mx,my)});r.addEventListener("mouseleave",()=>tp.weg());x+=w;});
+    svgEl("text",{x:x+8,y:y+16,"font-size":13},svg).textContent=fmt(d.s)+" m³/t";});
+  el.appendChild(svg);
+}
+
+/* ============ Karte (Leaflet) ============ */
+const ORTE = [
+  {n:"San José",info:"Hauptstadt",ll:[9.933,-84.08],typ:"stadt"},
+  {n:"Puerto Limón",info:"Hafen an der Karibik, ca. 90 % der Ananas-Exporte",ll:[9.99,-83.03],typ:"hafen",fest:true},
+  {n:"Puerto Caldera",info:"Hafen am Pazifik, ca. 10 % der Ananas-Exporte",ll:[9.91,-84.72],typ:"hafen",fest:true},
+  {n:"Los Chiles",info:"43 m ü. NN",ll:[10.964,-84.599],typ:"ort",verbergen:true},
+  {n:"Liberia",info:"144 m ü. NN, Guanacaste",ll:[10.633,-85.433],typ:"ort"},
+  {n:"Ciudad Quesada",info:"Zentrum der Nordzone",ll:[10.323,-84.427],typ:"ort"},
+  {n:"Siquirres",info:"Karibikzone",ll:[10.098,-83.507],typ:"ort"},
+  {n:"Buenos Aires",info:"Pazifikzone, Plantage Pindeco seit 1978",ll:[9.166,-83.334],typ:"ort"},
+  {n:"Cerro Chirripó",info:"3 820 m, höchster Berg",ll:[9.484,-83.489],typ:"berg"},
+  {n:"Vulkan Arenal",info:"1 670 m",ll:[10.463,-84.703],typ:"berg"},
+  {n:"Vulkan Irazú",info:"3 432 m",ll:[9.979,-83.852],typ:"berg"}
+];
+const ZONEN = [
+  {n:"Nordzone",ll:[10.62,-84.45],r:38000,anteil:"56 % der Fläche, 24 653 ha"},
+  {n:"Karibikzone",ll:[10.27,-83.62],r:26000,anteil:"25 % der Fläche, 11 188 ha"},
+  {n:"Pazifikzone",ll:[9.12,-83.3],r:24000,anteil:"19 % der Fläche, 8 659 ha"}
+];
+function karteBauen(id,optionen={}){
+  const el=document.getElementById(id); if(!el) return null;
+  if(typeof L==="undefined"){el.innerHTML="<div class='box rot' style='margin:16px'>Die Karte braucht eine Internetverbindung. Ohne Netz: Atlas, Physische Karte Mittelamerika.</div>";return null;}
+  const map=L.map(el,{scrollWheelZoom:false,zoomSnap:0.25}).fitBounds([[8.0,-86.0],[11.25,-82.5]],{padding:[4,4]});map.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
+  L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",{maxZoom:15,attribution:'Karte: © <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA), Daten © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(map);
+  // Gradnetz
+  for(let la=8;la<=12;la++){L.polyline([[la,-87],[la,-82]],{color:"#3a5a78",weight:1.2,dashArray:"4 4",opacity:.8,interactive:false}).addTo(map);
+    L.marker([la+0.06,-85.85],{icon:L.divIcon({className:"grad-lbl",html:la+"° N",iconSize:[40,14]}),interactive:false}).addTo(map);}
+  for(let lo=-87;lo<=-82;lo++){L.polyline([[7.5,lo],[12,lo]],{color:"#3a5a78",weight:1.2,dashArray:"4 4",opacity:.8,interactive:false}).addTo(map);
+    L.marker([8.12,lo+0.2],{icon:L.divIcon({className:"grad-lbl",html:(-lo)+"° W",iconSize:[40,14]}),interactive:false}).addTo(map);}
+  if(optionen.zonen!==false){ZONEN.forEach(z=>L.circle(z.ll,{radius:z.r,color:"#9a6b00",weight:2.5,fillColor:"#f2c230",fillOpacity:.45}).bindTooltip(`${z.n} ${z.anteil.split(" ")[0]} %`,{className:"lbl zone",direction:"center",permanent:true}).bindPopup(`<b>${z.n}</b><br>${z.anteil}`).addTo(map));}
+  ORTE.forEach(o=>{if(o.verbergen&&optionen.quiz)return;const farbe=o.typ==="hafen"?"#2b6ca3":o.typ==="berg"?"#7a4b22":"#22201c";
+    L.circleMarker(o.ll,{radius:o.typ==="stadt"?7:5,color:"#fff",weight:2,fillColor:farbe,fillOpacity:1}).bindTooltip(o.fest?o.n:`<b>${o.n}</b><br>${o.info}`,{className:"lbl",direction:"right",permanent:!!o.fest}).addTo(map);});
+  const anzeige=document.getElementById(id+"-koord");
+  if(anzeige){map.on("mousemove",e=>{anzeige.textContent="Mauszeiger: "+gm(e.latlng.lat,"N","S")+", "+gm(e.latlng.lng,"O","W");});}
+  (window._karten=window._karten||[]).push(map);
+  return map;
+}
+function gm(v,p,n){const a=Math.abs(v);const g=Math.floor(a);let m=Math.round((a-g)*60);let gg=g;if(m===60){gg++;m=0;}return `${gg}°${String(m).padStart(2,"0")}′ ${v>=0?p:n}`;}
+let quizMarker=null;
+function karteQuiz(map){
+  if(!map)return;const ziel=L.latLng(10.964,-84.599);
+  map.on("click",e=>{const d=map.distance(e.latlng,ziel)/1000;const r=document.getElementById("r-karte-klick");
+    if(quizMarker)map.removeLayer(quizMarker);quizMarker=L.marker(e.latlng).addTo(map);
+    if(d<25){r.className="rueck zeigen ok";r.innerHTML=`Getroffen (${fmt(d)} km daneben). Das ist <b>Los Chiles</b>, 43 m ü. NN, im Tiefland direkt an der Grenze zu Nicaragua, mitten in der Nordzone. Von hier stammt das Klimadiagramm in Stufe 4.`;markiere("karte-klick");}
+    else{r.className="rueck zeigen no";r.innerHTML=`Du liegst ${fmt(d)} km daneben (dein Klick: ${gm(e.latlng.lat,"N","S")}, ${gm(e.latlng.lng,"O","W")}). Tipp: Suche zuerst den 11. Breitengrad, dann zwischen 84° und 85° W.`;}});
+}
+
+/* ============ Seiteninhalte ============ */
+let aktuellesThema="start";
+const SEITEN = {};
+
+SEITEN.start = () => `
+<p class="lesen">Hier trainierst du alles, was eine Erdkunde-Klausur zum Anbau von Cash Crops in den Tropen verlangt. Das Beispiel ist die <b>Ananas aus Costa Rica</b>.</p>
+<div class="box gold"><h4>🍍 Ananas aus Costa Rica in Kürze</h4>
+<ul><li>Costa Rica ist der größte Ananas-Exporteur der Welt. Etwa die Hälfte geht in die USA, fast der ganze Rest in die EU.</li>
+<li>Die Anbaufläche hat sich seit 2000 ungefähr vervierfacht. Wald und Weideland wurden umgewandelt.</li>
+<li>Der Boom bringt Geld und Arbeit, aber auch Pestizide im Trinkwasser, Entwaldung und schwierige Arbeitsbedingungen.</li></ul></div>
+<h3>Deine Kompetenzleiter</h3>
+<p class="lesen">Die Stufen werden von oben nach unten schwerer. Sie folgen den drei Anforderungsbereichen (AFB): I wiedergeben, II anwenden und erklären, III beurteilen.</p>
+<div class="leiter">${THEMEN.filter(t=>/^\d$/.test(t.nr)||t.id==="probeklausur").map((t,i)=>`<a href="#${t.id}"><span class="stu" style="background:${["#4e9a6b","#3f8a5c","#2e7d55","#277048","#1f5a3d","#a7801a","#b8860b","#b5402f","#22201c"][i]}">${t.nr}</span><span><b>${t.titel}</b><small>${t.stufe} · ${t.unter}</small></span><span class="zaehler hinweis" data-zaehler="${t.id}"></span></a>`).join("")}</div>
+<div class="box"><h4>So arbeitest du mit der Seite</h4>
+<ul><li>Jede Stufe hat einen kurzen Erklärteil, Material und Übungen mit Sofort-Rückmeldung.</li>
+<li>Bei Schreibaufgaben vergleichst du selbst mit einer Musterlösung. Dein Text bleibt in diesem Browser gespeichert.</li>
+<li>Dein Fortschritt steht links in der Leiste.</li>
+<li>Zum Schluss schreibst du die Probeklausur unter Zeitdruck.</li></ul></div>
+<figure><img src="${BILDER.packstation}" alt="Packstation mit Ananas auf einem Förderband" loading="lazy"><figcaption>Vom Feld in den Karton: Ananas für den Export. KI-generiertes, stilisiertes Bild.</figcaption></figure>`;
+
+SEITEN.operatoren = () => `
+<p class="lesen">Operatoren sind die Verben in der Aufgabenstellung. Sie sagen dir genau, was du tun sollst. Wer beim Operator „beschreiben“ schon bewertet oder beim Operator „beurteilen“ nur aufzählt, verliert Punkte.</p>
+<div class="karte tab-scroll"><table>
+<tr><th>Operator</th><th>AFB</th><th>Was du tun sollst</th></tr>
+<tr><td><b>nennen</b></td><td>I</td><td>Informationen ohne Erklärung knapp aufzählen.</td></tr>
+<tr><td><b>beschreiben</b></td><td>I</td><td>Sachverhalte aus dem Material geordnet und mit Fachbegriffen wiedergeben. Keine Deutung, keine Gründe.</td></tr>
+<tr><td><b>einordnen / lokalisieren</b></td><td>I–II</td><td>Einen Raum mit Lagemerkmalen beschreiben: Kontinent, Staat, Nachbarn, Gradnetz, Relief, Klima, Verkehrswege.</td></tr>
+<tr><td><b>darstellen</b></td><td>II</td><td>Einen Zusammenhang strukturiert und gut verständlich aufzeigen.</td></tr>
+<tr><td><b>erläutern</b></td><td>II</td><td>Zusammenhänge mit Beispielen und Belegen aus dem Material nachvollziehbar machen. Immer: Aussage → Beleg (M…) → Bedeutung.</td></tr>
+<tr><td><b>erklären</b></td><td>II</td><td>Ursachen und Folgen begründet darlegen („weil“, „dadurch“, „folglich“).</td></tr>
+<tr><td><b>vergleichen</b></td><td>II</td><td>Gemeinsamkeiten und Unterschiede nach Kriterien gegenüberstellen.</td></tr>
+<tr><td><b>beurteilen</b></td><td>III</td><td>Ein begründetes <b>Sachurteil</b> fällen: Kriterien offenlegen, Pro und Contra abwägen, Fazit ziehen.</td></tr>
+<tr><td><b>bewerten / Stellung nehmen</b></td><td>III</td><td>Wie beurteilen, zusätzlich mit offengelegten <b>eigenen Wertmaßstäben</b> (Werturteil).</td></tr>
+</table><p class="quelle">Gekürzt nach der Operatorenübersicht für das Fach Erdkunde, Abitur NRW.</p></div>
+<div class="box blau"><h4>📌 Typischer Aufbau einer Cash-Crop-Klausur</h4>
+<ol><li><b>Einordnen und beschreiben</b> (AFB I/II): Wo liegt der Raum? Passen Klima, Boden, Relief zur Pflanze? Wie hat sich der Anbau entwickelt?</li>
+<li><b>Erläutern</b> (AFB II): Welche wirtschaftliche Bedeutung hat der Anbau für das Land?</li>
+<li><b>Beurteilen</b> (AFB III): Ist der Anbau zukunftsfähig? Kriterium: Dreieck der Nachhaltigkeit.</li></ol></div>
+${mc("op1",1,"Welcher Operator verlangt, dass du Material nur geordnet wiedergibst, ohne Gründe zu nennen?",["erläutern","beschreiben","beurteilen","erklären"],1,"„Beschreiben“ gehört zum AFB I. Gründe und Folgen kommen erst beim Erläutern oder Erklären.","AFB I")}
+${zuordnen("op2",1,"Ordne jedem Operator seinen Anforderungsbereich zu.",[["nennen","I"],["beschreiben","I"],["erläutern","II"],["vergleichen","II"],["beurteilen","III"],["bewerten","III"]],["I","II","III"],"Faustregel: I = wiedergeben, II = Zusammenhänge herstellen, III = urteilen.","AFB I")}
+${mc("op3",2,"Welcher Satz ist eine <b>Erläuterung</b> und keine bloße Beschreibung?",
+ ["Die Ananasproduktion stieg von 0,9 Mio. t (2000) auf 2,9 Mio. t (2022).",
+  "Die Ananas ist für Costa Rica wichtig, weil sie mit 6,4 % der Exporte (M5) Devisen bringt, mit denen das Land Importe bezahlen kann.",
+  "Costa Rica liegt zwischen 8° und 11° nördlicher Breite.",
+  "Die USA kaufen 50 % der Ananas-Exporte."],1,
+ "Der zweite Satz verbindet Aussage, Beleg und Bedeutung. Die anderen Sätze geben nur Daten wieder.","AFB II")}
+${mc("op4",3,"In Aufgabe 3 steht „Beurteilen Sie die Zukunftsfähigkeit … anhand des Dreiecks der Nachhaltigkeit“. Was ist für volle Punktzahl <b>unverzichtbar</b>?",
+ ["Möglichst viele Probleme aufzählen, damit der Text lang wird.",
+  "Die eigene Meinung zu Ananas schildern, z. B. ob sie dir schmeckt.",
+  "Je Dimension (Ökologie, Ökonomie, Soziales) positive und negative Aspekte mit Materialbelegen nennen, abwägen und ein begründetes Fazit ziehen.",
+  "Nur die ökologischen Folgen untersuchen, weil sie am wichtigsten sind."],2,
+ "Beurteilen heißt: Kriterien offenlegen, beide Seiten prüfen, gewichten, Fazit begründen. Eine persönliche Vorliebe ist kein Kriterium.","AFB III")}
+${mc("op5",3,"Welcher Satz ist ein <b>Werturteil</b> (passt zu „bewerten“) und kein Sachurteil (passt zu „beurteilen“)?",
+ ["Da die Exporte zu 94 % in nur zwei Märkte gehen, ist die Branche stark von deren Nachfrage abhängig.",
+  "Ich finde es unverantwortlich, Ananas aus Costa Rica zu kaufen, solange Dörfer kein sauberes Trinkwasser haben.",
+  "Weil 2003 der Sortenschutz der MD-2 endete, stieg die Zahl der Anbaubetriebe stark an.",
+  "Der Wasserfußabdruck der Ananas ist kleiner als der der Banane."],1,
+ "Satz 2 legt einen persönlichen Wertmaßstab offen („ich finde … unverantwortlich“). Sachurteile stützen sich nur auf Material und Kriterien.","AFB III")}
+`;
+
+SEITEN.begriffe = () => {
+  const K=[
+   ["Cash Crop","Marktfrucht, die vor allem für den Verkauf angebaut wird, oft für den Export. Beispiele: Ananas, Bananen, Kaffee, Kakao."],
+   ["Food Crop","Nahrungspflanze für die Versorgung der eigenen Familie oder des lokalen Marktes, z. B. Mais, Bohnen, Maniok."],
+   ["Subsistenz­wirtschaft","Landwirtschaft zur Selbstversorgung. Produziert wird für den eigenen Bedarf, kaum für den Markt."],
+   ["Plantage","Großbetrieb, der meist eine Dauerkultur für den Weltmarkt anbaut. Hoher Kapitaleinsatz, viele Lohnarbeitskräfte, oft im Besitz von Konzernen."],
+   ["Monokultur","Auf derselben Fläche wird über Jahre nur eine Pflanzenart angebaut. Folgen: Schädlinge breiten sich leicht aus, der Boden laugt aus, viel Dünger und Pestizide."],
+   ["Export­abhängigkeit","Ein Land, eine Region oder ein Betrieb hängt stark vom Verkauf weniger Güter an wenige Abnehmer ab. Preis- oder Nachfrageeinbrüche treffen dann hart."],
+   ["Landgrabbing","Aneignung großer Flächen durch Investoren, Konzerne oder Staaten, oft ohne faire Beteiligung der bisherigen Nutzer. Die lokale Bevölkerung verliert ihre Lebensgrundlage."],
+   ["Land­konzentration","Immer mehr Fläche gehört immer weniger Betrieben, z. B. weil kleine Betriebe nach einer Preiskrise aufgeben und verkaufen."],
+   ["Devisen","Ausländische Zahlungsmittel (z. B. US-Dollar, Euro), die ein Land durch Exporte einnimmt und für Importe braucht."],
+   ["BIP / BIP pro Kopf","Wert aller Waren und Dienstleistungen, die in einem Jahr in einem Land hergestellt werden. Pro Kopf: geteilt durch die Einwohnerzahl."],
+   ["HDI","Human Development Index: misst Entwicklung über Lebenserwartung, Bildung und Einkommen. Werte von 0 bis 1."],
+   ["Wasser­fußabdruck","Wasser, das bei der Herstellung eines Produkts verbraucht oder verschmutzt wird. Grün: Regenwasser. Blau: Bewässerung aus Flüssen, Seen, Grundwasser. Grau: Wasser, das nötig ist, um die Verschmutzung zu verdünnen."],
+   ["Pestizide","Pflanzenschutzmittel gegen Unkräuter (Herbizide), Insekten (Insektizide) oder Pilze (Fungizide)."],
+   ["Boden­versalzung","Bei Bewässerung in trockenen, heißen Gebieten verdunstet Wasser, gelöste Salze bleiben im Oberboden zurück. Der Boden wird unfruchtbar."],
+   ["Dreieck der Nachhaltigkeit","Modell mit drei Dimensionen: Ökologie, Ökonomie, Soziales. Nachhaltig ist eine Entwicklung, wenn sie alle drei langfristig sichert."]
+  ];
+  return `<p class="lesen">Klicke auf eine Karte, um sie umzudrehen. Sag die Erklärung erst laut, dann prüfe.</p>
+<div class="karteikarten">${K.map(k=>`<button class="kk" onclick="this.classList.toggle('um')" aria-label="Karteikarte ${k[0]}"><span class="in"><span class="vs">${k[0]}</span><span class="rs">${k[1]}</span></span></button>`).join("")}</div>
+${mc("fb1",1,"Eine Familie in Nicaragua baut Mais und Bohnen an und isst fast alles selbst. Wie nennt man das?",["Plantagenwirtschaft mit Cash Crops","Subsistenzwirtschaft mit Food Crops","Exportorientierte Monokultur","Landgrabbing"],1,"Mais und Bohnen dienen hier der Selbstversorgung: Food Crops in Subsistenzwirtschaft.","AFB I")}
+${zuordnen("fb2",1,"Cash Crop oder Food Crop? Ordne zu, wie die Pflanze <b>im jeweiligen Beispiel</b> genutzt wird.",[["Ananas aus Costa Rica für Supermärkte in Europa","Cash Crop"],["Maniok im eigenen Garten einer Kleinbauernfamilie","Food Crop"],["Kaffee einer Genossenschaft, der nach Hamburg verschifft wird","Cash Crop"],["Bohnen, die eine Familie selbst isst","Food Crop"],["Kakao von der Elfenbeinküste für die Schokoladenindustrie","Cash Crop"]],["Cash Crop","Food Crop"],"Entscheidend ist der Zweck: Verkauf (Cash Crop) oder eigene Versorgung (Food Crop).","AFB I")}
+${zuordnen("fb3",2,"Welcher Wasseranteil ist gemeint?",[["Regen, der im Boden versickert und von der Ananaspflanze verdunstet wird","grün"],["Wasser aus einem Brunnen, mit dem ein Feld in der Trockenzeit beregnet wird","blau"],["Wasser, das nötig wäre, um ausgewaschenes Herbizid im Grundwasser auf einen unbedenklichen Wert zu verdünnen","grau"],["Flusswasser für Tropfbewässerung","blau"]],["grün","blau","grau"],"Grün = Regen, Blau = Bewässerung, Grau = Verschmutzung.","AFB I")}
+${mc("fb4",3,"Nach der Preiskrise 2014/15 geben viele kleine Ananasbetriebe auf und verkaufen ihr Land an große Firmen. Welcher Begriff trifft das am genauesten?",["Landgrabbing, weil Konzerne Land erwerben","Landkonzentration, weil Fläche in weniger Hände kommt; von Landgrabbing spricht man erst, wenn Nutzer ohne faire Beteiligung verdrängt werden","Subsistenzwirtschaft, weil die Bauern nun für sich selbst produzieren","Monokultur, weil nur noch Ananas wächst"],1,"Ein freiwilliger Verkauf ist zunächst Landkonzentration. Landgrabbing betont Verdrängung, fehlende Mitsprache und Verlust der Lebensgrundlage. In der Klausur lohnt es sich, diesen Unterschied zu zeigen.","AFB II")}
+${mc("fb5",3,"Costa Rica hat einen hohen HDI (0,833), aber ein deutlich niedrigeres BIP pro Kopf als Deutschland. Was folgt daraus?",["Der HDI ist falsch berechnet.","Das Land erreicht bei Bildung und Gesundheit viel, obwohl das Einkommen niedriger ist; der HDI misst mehr als Geld.","Costa Rica ist ein Entwicklungsland mit niedrigem Lebensstandard.","BIP und HDI messen dasselbe."],1,"Der HDI kombiniert Lebenserwartung, Bildung und Einkommen. Ein hoher HDI bei mittlerem Einkommen ist typisch für Costa Rica.","AFB II")}
+`;};
+
+SEITEN.verorten = () => `
+<p class="lesen">„Ordnen Sie das Anbaugebiet geographisch ein“ heißt: Du gehst <b>vom Großen ins Kleine</b>. Dafür nutzt du Karten, zum Beispiel aus dem Atlas. Hier übst du mit einer Online-Reliefkarte.</p>
+<div class="box"><h4>🧭 Lage beschreiben in fünf Schritten</h4>
+<ol><li><b>Großraum:</b> Kontinent, Teilraum (z. B. Mittelamerika, Landbrücke zwischen Nord- und Südamerika).</li>
+<li><b>Staat und Nachbarn:</b> angrenzende Staaten, Meere, Hauptstadt.</li>
+<li><b>Gradnetz:</b> Breiten- und Längengrade, Klimazone (Tropen? Subtropen?).</li>
+<li><b>Relief und Naturraum:</b> Gebirge, Tiefländer, Höhenlage, Flüsse, Böden.</li>
+<li><b>Infrastruktur:</b> Häfen, Straßen, Entfernung zu Märkten.</li></ol></div>
+<div class="diagramm" style="padding:8px"><h5 style="margin:4px 6px 8px">M1 Costa Rica: Relief, Gradnetz und Ananas-Anbauzonen</h5>
+<div id="karte"></div><div class="koord" id="karte-koord">Fahre mit der Maus über die Karte. Hier erscheinen die Koordinaten.</div>
+<p class="quelle">Gelbe Kreise: Lage der drei Anbauzonen (vereinfacht), Flächen 2018 nach CANAPEP. Gestrichelt: Gradnetz in 1°-Schritten.</p></div>
+<div class="ueb" data-ueb="karte-klick">${kopf(1,"AFB I")}<div class="frage">Klicke auf die Karte an die Stelle <b>10°58′ N, 84°36′ W</b>. Welcher Ort liegt dort?</div><div class="rueck" id="r-karte-klick"></div></div>
+${(reg("karte-klick"),"")}
+${mc("ve2",1,"In welcher Zone liegt mehr als die Hälfte der Ananasfläche?",["Pazifikzone im Süden","Karibikzone um Siquirres","Nordzone im Tiefland an der Grenze zu Nicaragua","Zentrales Hochland um San José"],2,"56 % der Fläche liegen in der Nordzone (Zona Norte), einem flachen, tief gelegenen Raum nördlich der Vulkankette.","AFB I")}
+${mc("ve3",2,"Über welchen Hafen wird der Großteil exportiert, und warum passt das zu den Hauptabnehmern?",["Puerto Caldera am Pazifik, weil die USA westlich liegen","Puerto Limón an der Karibik, weil Schiffe von dort direkt nach Houston (12–15 Tage) und Nordeuropa (14–20 Tage) fahren","Über den Flughafen San José, weil Ananas schnell verdirbt","Über Nicaragua, weil die Nordzone dort angrenzt"],1,"Rund 90 % gehen über Puerto Limón. Die Karibikseite ist der kurze Weg zur US-Golfküste und über den Atlantik nach Europa.","AFB I/II")}
+${mc("ve4",2,"Welche Aussage zum Relief stimmt?",["Costa Rica ist überwiegend flach.","Eine Kette aus Vulkanen und Gebirgen zieht von Nordwesten nach Südosten (Cordillera de Guanacaste, Central, Talamanca, bis 3 820 m). Nördlich und an der Karibik liegen weite Tiefländer.","Die höchsten Berge liegen an der Karibikküste.","Die Anbauzonen liegen alle über 1 500 m Höhe."],1,"Das Rückgrat des Landes ist die Gebirgs- und Vulkankette. Die Ananas wächst vor allem in den Tiefländern davor.","AFB I")}
+${ordnen("ve5",2,"Bringe die Sätze einer Lagebeschreibung in eine sinnvolle Reihenfolge (vom Großen ins Kleine).",[
+ "Costa Rica liegt in Mittelamerika auf der Landbrücke zwischen Nord- und Südamerika.",
+ "Es grenzt im Norden an Nicaragua, im Südosten an Panama, im Osten an das Karibische Meer und im Westen an den Pazifik.",
+ "Das Land erstreckt sich etwa von 8° bis 11° N und von 82°30′ bis 86° W und liegt damit in den Tropen.",
+ "Eine Gebirgs- und Vulkankette durchzieht das Land von Nordwesten nach Südosten; davor liegen Tiefländer.",
+ "Das wichtigste Anbaugebiet, die Nordzone, liegt im Tiefland an der Grenze zu Nicaragua; exportiert wird vor allem über Puerto Limón."],
+ "So entsteht ein Text, der vom Kontinent bis zum konkreten Anbaugebiet führt.","AFB I")}
+${schreib("ve6",4,"<b>Klausurtraining:</b> Ordne die Anbaugebiete für Ananas in Costa Rica geographisch ein. Nutze M1 und die fünf Schritte.",
+ ["Großraum Mittelamerika / Landbrücke genannt","Nachbarstaaten und beide Meere genannt","Gradnetz mit Zahlen (ca. 8°–11° N, 82°30′–86° W), Tropen","Relief: Gebirgskette NW–SO, Tiefländer, Höhenangabe","Drei Anbauzonen mit Lage und Anteil, Nordzone als Schwerpunkt","Infrastruktur: Puerto Limón, ggf. Puerto Caldera"],
+ `<p>Costa Rica liegt in Mittelamerika, auf der Landbrücke zwischen Nord- und Südamerika. Im Norden grenzt es an Nicaragua, im Südosten an Panama. Im Osten liegt das Karibische Meer, im Westen der Pazifik. Das Land erstreckt sich etwa zwischen 8° und 11° nördlicher Breite sowie 82°30′ und 86° westlicher Länge und gehört damit zu den Tropen (M1).</p>
+<p>Von Nordwesten nach Südosten zieht sich eine Kette aus Vulkanen und Gebirgen (Cordillera de Guanacaste, Cordillera Central, Cordillera de Talamanca mit dem Cerro Chirripó, 3 820 m). Nördlich dieser Kette und an der Karibikküste liegen ausgedehnte Tiefländer.</p>
+<p>Ananas wird in drei Zonen angebaut. Die wichtigste ist die Nordzone mit 56 % der Fläche (ca. 24 700 ha). Sie liegt im Tiefland um etwa 10°30′ bis 11° N und 84° bis 85° W an der Grenze zu Nicaragua, z. B. um Los Chiles (43 m ü. NN). Ein Viertel der Fläche liegt in der Karibikzone um Siquirres, knapp ein Fünftel im Süden der Pazifikseite um Buenos Aires. Exportiert wird zu rund 90 % über den Hafen Puerto Limón an der Karibikküste (M1).</p>`,"AFB I/II")}
+`;
+
+SEITEN.klima = () => `
+<p class="lesen">Jetzt prüfst du, ob der Naturraum zur Pflanze passt. Dafür brauchst du zwei Dinge: das <b>Klimadiagramm</b> eines Ortes im Anbaugebiet und den <b>Steckbrief</b> der Pflanze.</p>
+<div class="raster">
+<div class="karte"><span class="mat">M2 Steckbrief Ananas</span>
+<ul style="font-size:16px;line-height:1.5;padding-left:18px">
+<li><b>Herkunft:</b> tropisches Südamerika; heute weltweit in den Tropen angebaut. Exportsorte in Costa Rica: MD-2 („Golden Sweet“).</li>
+<li><b>Pflanze:</b> Staude, ca. 1 m hoch, Blätter in einer Rosette. Sie nutzt CAM-Fotosynthese: Spaltöffnungen nachts offen, darum geringer Wasserverlust.</li>
+<li><b>Temperatur:</b> optimal ca. 20–30 °C, kein Frost.</li>
+<li><b>Niederschlag:</b> gut ca. 1 000–1 500 mm, gleichmäßig verteilt; Faustregel: ohne Bewässerung ungeeignet, wenn mehr als 3 Monate unter 15 mm liegen.</li>
+<li><b>Boden:</b> locker, gut durchlässig, sauer (pH ca. 4,5–6); keine Staunässe.</li>
+<li><b>Höhe:</b> vor allem im Tiefland, in Äquatornähe bis ca. 1 000 m.</li>
+<li><b>Anbau:</b> Ernte 14–18 Monate nach der Pflanzung; Blühen wird künstlich ausgelöst, so ist ganzjährig Ernte möglich. Pro Hektar bleiben rund 26 t Pflanzenreste („Rastrojo“).</li></ul>
+<p class="quelle">Zusammengestellt nach FAO-Übersichten und Wikifarmer; Werte gerundet.</p></div>
+<figure style="margin:18px 0"><img src="${BILDER.pflanze}" alt="Reife Ananas an der Pflanze" loading="lazy"><figcaption>Die Frucht wächst einzeln in der Mitte der Blattrosette. KI-generiertes, stilisiertes Bild.</figcaption></figure>
+</div>
+<div class="diagramm" id="kd1"><h5>M3 Klimadiagramm Los Chiles (Nordzone)</h5></div>
+<p class="quelle">Daten: Instituto Meteorológico Nacional Costa Rica, Mittel 1995–2015. Fahre über das Diagramm, um die Monatswerte zu sehen.</p>
+<div class="box blau"><h4>📏 So liest du ein Klimadiagramm</h4>
+<ul><li>Im Diagramm entsprechen 10 °C genau 20 mm. Liegt die Temperaturkurve <b>über</b> der Niederschlagssäule, ist der Monat <b>arid</b> (trocken): Es kann mehr Wasser verdunsten, als fällt.</li>
+<li>Über 100 mm wird der Niederschlag verkürzt gezeichnet (dunkle Säulen), sonst passt das Diagramm nicht aufs Blatt.</li>
+<li>Jahresniederschlag: alle Monate addieren. Jahresmitteltemperatur: alle Monate addieren, durch 12 teilen.</li>
+<li>Schwankt die Temperatur übers Jahr nur um wenige Grad, ist das typisch für die Tropen (Tageszeitenklima).</li></ul></div>
+${num("kl1",1,"Wie hoch ist der Jahresniederschlag in Los Chiles? (auf ganze mm)",1720,25,"mm","Summe aller Monate: 85,5 + 41,1 + 29,0 + 42,4 + 163,1 + 222,6 + 262,0 + 217,0 + 194,1 + 198,3 + 147,7 + 117,0 = <b>1 719,8 mm</b>.","AFB I")}
+${num("kl2",1,"Wie hoch ist die Jahresmitteltemperatur in Los Chiles? (eine Nachkommastelle)",26.8,0.15,"°C","Summe 321,4 °C, geteilt durch 12 = <b>26,8 °C</b>.","AFB I")}
+${num("kl3",2,"Wie viele Monate sind in Los Chiles arid?",3,0,"Monate","Februar (41 mm &lt; 51 mm), März (29 &lt; 53) und April (42 &lt; 55). Alle anderen Monate sind humid. Wichtig: Auch in der Trockenzeit fällt noch Regen, kein Monat liegt unter 15 mm.","AFB I")}
+${zuordnen("kl4",2,"Gleiche die Ansprüche der Ananas (M2) mit dem Standort Los Chiles (M3) ab.",[
+ ["Temperatur 20–30 °C, kein Frost (Los Chiles: 25,4–27,8 °C)","erfüllt"],
+ ["Niederschlag ca. 1 000–1 500 mm (Los Chiles: 1 720 mm)","erfüllt"],
+ ["Höchstens 3 Monate unter 15 mm (Los Chiles: kein Monat unter 15 mm)","erfüllt"],
+ ["Höhenlage Tiefland bis 1 000 m (Los Chiles: 43 m)","erfüllt"],
+ ["Keine Staunässe in den nassen Monaten Juni bis Oktober (über 190 mm pro Monat)","nur mit Entwässerung"]],
+ ["erfüllt","nur mit Entwässerung","nicht erfüllt"],
+ "Fast alles passt. Die Menge liegt sogar leicht über dem Bedarf. Darum legen Plantagen Entwässerungsgräben an. Bewässerung ist in der Nordzone kaum nötig. Das ist ein Unterschied zu Früchten, die in trockeneren Räumen bewässert werden müssen.","AFB II")}
+<h3>Zum Vergleich: ein trockener Standort</h3>
+<p class="lesen">Im Nordwesten des Landes, in Guanacaste, ist die Trockenzeit viel ausgeprägter. Hier siehst du, wie ein Standort aussieht, an dem eine Frucht <b>bewässert</b> werden müsste.</p>
+<div class="diagramm" id="kd2"><h5>M4 Klimadiagramm Liberia (Guanacaste)</h5></div>
+<p class="quelle">Daten: Instituto Meteorológico Nacional Costa Rica (Niederschlag 1957–2012, Temperatur 1977–2013).</p>
+${num("kl5",2,"Wie viele Monate sind in Liberia arid?",5,0,"Monate","Dezember bis April: 12, 1, 2, 4 und 24 mm bei Temperaturen um 26–28 °C. Der November (98 mm) ist knapp humid.","AFB I")}
+${mc("kl6",3,"Ein Investor will in Guanacaste um Liberia Ananas anbauen. Was folgt aus M2 und M4?",
+ ["Kein Problem, denn der Jahresniederschlag (1 600 mm) liegt im Bedarf.",
+  "Ohne Bewässerung ungeeignet: Vier Monate liegen unter 15 mm. Die Jahressumme täuscht, weil fast der ganze Regen von Mai bis Oktober fällt.",
+  "Die Temperaturen sind zu niedrig.",
+  "Ananas braucht gar keinen Regen, weil sie CAM-Fotosynthese betreibt."],1,
+ "Die Verteilung ist entscheidend, nicht nur die Summe. Gute Klausurantworten nennen beides.","AFB II")}
+${mc("kl7",3,"Warum kann dauerhafte Bewässerung in Guanacaste neue Probleme schaffen?",
+ ["Weil Bewässerungswasser immer giftig ist.",
+  "In der heißen Trockenzeit verdunstet viel Wasser; gelöste Salze bleiben im Boden (Versalzungsgefahr). Außerdem konkurriert die Plantage mit Dörfern und Tourismus um knappes Grund- und Flusswasser.",
+  "Weil die Pflanzen dann zu schnell wachsen.",
+  "Bewässerung schafft keine Probleme, sie steigert nur die Ernte."],1,
+ "Diese Kette (Bewässerung → Verdunstung → Salzanreicherung; Wasserentnahme → Nutzungskonflikt) ist Transferwissen für jede bewässerte Exportfrucht.","AFB II")}
+${schreib("kl8",4,"<b>Klausurtraining:</b> Beschreibe die Eignung der Nordzone für den Ananasanbau. Nutze M2 und M3.",
+ ["Klimadaten mit Zahlen: 26,8 °C, 1 720 mm, geringe Temperaturschwankung","Trockenzeit Februar bis April benannt, aber kein Monat unter 15 mm","Abgleich mit den Ansprüchen aus M2 (Temperatur, Niederschlag, Verteilung)","Relief und Höhe: Tiefland, 43 m","Boden: locker, sauer (Anspruch) erwähnt","Fazit: gut geeignet, Bewässerung kaum nötig, eher Entwässerung"],
+ `<p>Los Chiles liegt im Tiefland der Nordzone auf 43 m Höhe. Die Jahresmitteltemperatur beträgt 26,8 °C und schwankt über das Jahr nur zwischen 25,4 °C und 27,8 °C. Das ist typisch für die Tropen. Mit 1 720 mm fällt reichlich Niederschlag. Von Februar bis April gibt es eine kurze Trockenzeit; die Monate sind arid, aber es fallen noch 29–42 mm. Von Mai bis Oktober fallen meist über 190 mm im Monat (M3).</p>
+<p>Die Ananas braucht 20–30 °C, keinen Frost und etwa 1 000–1 500 mm gut verteilten Niederschlag (M2). Diese Ansprüche sind erfüllt. Durch ihre CAM-Fotosynthese übersteht sie die kurze Trockenzeit ohne Bewässerung. Weil die Pflanze keine Staunässe verträgt, müssen die Felder in der Regenzeit entwässert werden. Zusammen mit dem flachen Tiefland ist die Nordzone damit gut für den Ananasanbau geeignet.</p>`,"AFB I/II")}
+`;
+
+SEITEN.statistik = () => `
+<p class="lesen">Fast jede Klausur enthält ein Diagramm zur Entwicklung von Produktion, Export oder Preisen. Beim <b>Beschreiben</b> zählt Genauigkeit: Zeitraum, Anfangs- und Endwert mit Einheit, Gesamttrend, Phasen und Ausreißer, ein Vergleichswert (z. B. „verdreifacht“).</p>
+<div class="diagramm" id="d-prod"><h5>M5 Ananasproduktion in Costa Rica 1990–2022 (in Mio. t)</h5></div>
+<p class="quelle">Quelle: FAOSTAT (abgerufen über die Länderübersicht „List of countries by pineapple production“, Stand 2024). Punkte antippen für Werte.</p>
+<div class="raster">
+<div class="diagramm" id="d-flaeche"><h5>M6 Anbaufläche (in 1 000 ha)</h5></div>
+<div class="diagramm" id="d-welt"><h5>M7 Größte Produzenten 2022 (in Mio. t)</h5></div>
+</div>
+<p class="quelle">M6: CANAPEP/INEC nach Fruitrop Nr. 262 (2019). Auswertungen von Satellitenbildern ergaben 2017 sogar über 66 000 ha. M7: FAOSTAT.</p>
+<div class="box"><h4>✍️ Bausteine für gute Beschreibungen</h4>
+<ul><li><b>Zeitraum:</b> „Im Zeitraum von 2000 bis 2022 …“</li>
+<li><b>Trend:</b> „stieg stark / stetig / sprunghaft“, „stagnierte“, „ging zurück“, „schwankte“</li>
+<li><b>Werte mit Einheit:</b> „von 0,9 Mio. t auf 2,9 Mio. t“</li>
+<li><b>Vergleich:</b> „mehr als verdreifacht“, „um rund 220 % gewachsen“</li>
+<li><b>Besonderheit:</b> „Höchstwert 2018 mit 3,4 Mio. t, danach Rückgang“</li></ul></div>
+${num("st1",1,"Um welchen Faktor ist die Produktion von 2000 bis 2022 gewachsen? (eine Nachkommastelle)",3.2,0.06,"-fach","2 909 750 t : 903 125 t ≈ <b>3,2</b>. Die Produktion hat sich also mehr als verdreifacht.","AFB I")}
+${num("st2",2,"Welchen Anteil hatte Costa Rica 2022 an der Weltproduktion? (eine Nachkommastelle)",9.9,0.15,"%","2 909 750 t : 29 361 138 t ≈ 0,099 = <b>9,9 %</b>. Bei den Exporten frischer Ananas ist der Anteil viel höher: Costa Rica liefert knapp zwei Drittel aller Ananas, die weltweit exportiert werden.","AFB I/II")}
+${num("st3",3,"Berechne den Ertrag 2018 in Tonnen pro Hektar (Produktion M5 : Fläche M6, ganze Zahl).",77,2,"t/ha","3 418 155 t : 44 500 ha ≈ <b>77 t/ha</b>. Das ist ein sehr hoher Wert. Er setzt hohen Einsatz von Dünger, Pestiziden und Technik voraus. Rechnet man mit den 66 000 ha aus den Satellitenbildern, sinkt der Ertrag auf rund 52 t/ha. Daran siehst du: Statistiken zu Flächen sind unsicher, die tatsächliche Ausdehnung war wohl größer als gemeldet.","AFB II")}
+${fehler("st4",2,"Diese Beschreibung von M5 enthält vier Fehler. Klicke sie an und prüfe dann.",[
+ "Im Zeitraum von 1990 bis 2022 ist die Ananasproduktion in Costa Rica ",["verdoppelt worden",true,"Von 0,42 auf 2,91 Mio. t ist fast eine Versiebenfachung; seit 2000 eine Verdreifachung."],". Besonders stark stieg sie ",["zwischen 2000 und 2010",false,""],", als sie von 0,9 auf 2,3 Mio. t wuchs. Seitdem ist die Produktion ",["stetig weiter gestiegen",true,"Nach dem Höchstwert 2018 (3,4 Mio. t) ging sie bis 2020 auf 2,6 Mio. t zurück und lag 2022 bei 2,9 Mio. t."],". Der Höchstwert wurde ",["2022",true,"Der Höchstwert liegt 2018 mit 3,42 Mio. t."]," erreicht. Insgesamt zeigt das Diagramm, ",["dass die Ananas ungesund ist",true,"Das gibt M5 nicht her. Beim Beschreiben keine Wertungen oder fremden Aussagen."],"."],
+ "Gerade die Phase nach 2018 wird oft übersehen. Ausreißer und Rückgänge bringen Punkte.","AFB I")}
+${schreib("st5",4,"<b>Klausurtraining:</b> Beschreibe die Entwicklung des Ananasanbaus in Costa Rica seit 2000 (M5, M6, M7).",
+ ["Zeitraum und Anfangs-/Endwert mit Einheit (0,9 → 2,9 Mio. t)","Vergleichswert („mehr als verdreifacht“)","Phase starken Wachstums 2000–2010 und Höchstwert 2018","Rückgang nach 2018 und Erholung bis 2022","Fläche: 11 000 ha → 44 500 ha (ca. vervierfacht), Satellitenwert erwähnt","Einordnung im Weltvergleich (Platz 3, ca. 10 %)"],
+ `<p>Seit 2000 ist der Ananasanbau in Costa Rica stark gewachsen. Die Produktion stieg von 0,9 Mio. t (2000) auf 2,9 Mio. t (2022) und hat sich damit mehr als verdreifacht (M5). Am stärksten war das Wachstum zwischen 2000 und 2010 (auf 2,3 Mio. t). Den Höchstwert erreichte die Produktion 2018 mit 3,4 Mio. t. Danach ging sie bis 2020 auf 2,6 Mio. t zurück und lag 2022 wieder bei 2,9 Mio. t.</p>
+<p>Die Anbaufläche wuchs von etwa 11 000 ha (2000) auf 44 500 ha (2018), sie hat sich also ungefähr vervierfacht (M6). Satellitenbilder zeigen 2017 sogar über 66 000 ha. 2022 lag Costa Rica mit knapp 10 % der Weltproduktion auf Platz 3 hinter Indonesien und den Philippinen (M7).</p>`,"AFB I")}
+`;
+
+SEITEN.wirtschaft = () => `
+<p class="lesen">„Erläutern Sie die wirtschaftliche Bedeutung“ verlangt mehr als Zahlen. Du musst zeigen, <b>was die Zahlen für das Land bedeuten</b>. Dafür vergleichst du die Ananas mit der Gesamtwirtschaft, schaust auf Abnehmer und Preise und fragst, wer profitiert.</p>
+<div class="karte tab-scroll"><span class="mat">M8 Länderdaten Costa Rica</span>
+<table>
+<tr><td>Fläche</td><td>51 100 km² (etwa so groß wie Niedersachsen)</td></tr>
+<tr><td>Einwohner (2024)</td><td>ca. 5,2 Mio., Wachstum ca. 0,5 %/Jahr</td></tr>
+<tr><td>BIP pro Kopf (2024)</td><td>ca. 17 900 US-$</td></tr>
+<tr><td>BIP nach Sektoren</td><td>I: ca. 4 % (ca. 11 % der Beschäftigten) · II: ca. 20 % · III: ca. 69 %</td></tr>
+<tr><td>Wichtigste Exportgüter (2023)</td><td>Medizinprodukte 42 % · Bananen 6,5 % · Ananas 6,4 % · Sirupe und Konzentrate 3,6 % · Kaffee 1,9 %</td></tr>
+<tr><td>HDI (2023)</td><td>0,833; Rang 62 von 193 („sehr hohe menschliche Entwicklung“)</td></tr>
+<tr><td>Ananassektor</td><td>ca. 2 % des BIP, über 30 % des Agrar-BIP; ca. 30 000 direkte und 120 000 indirekte Arbeitsplätze (2018)</td></tr>
+</table><p class="quelle">Gerundet nach IWF/WKO-Länderprofil, UNDP Human Development Report, PROCOMER (Exportwerte 2023), CANAPEP nach Fruitrop Nr. 262.</p></div>
+<div class="raster">
+<div class="diagramm" id="d-exporte"><h5>M9 Anteile an den Warenexporten 2023 (in %)</h5></div>
+<div class="diagramm" id="d-abnehmer"><h5>M10 Abnehmer der Ananas-Exporte</h5></div>
+</div>
+<p class="quelle">M9: PROCOMER. M10: CANAPEP nach Fruitrop (2017). 2025 lagen die USA bei 54 %, Belgien bei 12 %, Spanien bei 8 % (PROCOMER, Jan.–Sep.). Costa Rica liefert rund 84 % aller Ananas, die die USA importieren.</p>
+<div class="raster">
+<div class="diagramm" id="d-wert"><h5>M11 Exportwert frischer Ananas (Mio. US-$)</h5></div>
+<div class="diagramm" id="d-firmen"><h5>M12 Marktanteile der Produzenten 2017 (in %)</h5></div>
+</div>
+<p class="quelle">M11: UN-Comtrade-Daten (HS 080430), zusammengestellt von Tridge und anderen; Werte gerundet. Der Durchschnittspreis lag 2014 bei ca. 420 US-$/t, 2023 bei ca. 540 US-$/t. Die Produktionskosten stiegen 2002–2014 um 45 % (Oxfam 2016). M12: CANAPEP nach Fruitrop.</p>
+<h3>Der Weg der Ananas</h3>
+<div class="karte weg" id="weg"></div>
+<div class="box gold"><h4>🧩 Eine Erläuterung bauen</h4><p><b>Aussage</b> (Was?) → <b>Beleg</b> (Zahl aus M…) → <b>Bedeutung</b> (Was folgt daraus für das Land, die Menschen, die Betriebe?)</p>
+<p><i>Beispiel:</i> Ananas ist nach Bananen das zweitwichtigste Agrarexportgut (Aussage). Sie bringt 6,4 % der Exporterlöse ein, über 1,1 Mrd. US-$ (M9, M11) (Beleg). Damit verdient das Land Devisen und schafft Arbeit im ländlichen Raum, wo es sonst wenig Industrie gibt (Bedeutung).</p></div>
+${num("wi1",1,"2023 brachte die Ananas 1,15 Mrd. US-$ ein, alle Warenexporte zusammen 18,1 Mrd. US-$. Wie groß ist ihr Anteil? (eine Nachkommastelle)",6.4,0.1,"%","1,15 : 18,1 ≈ 0,0635 = <b>6,4 %</b>.","AFB I")}
+${zuordnen("wi2",2,"Stimmt die Aussage laut M8–M12?",[
+ ["Die Ananas ist das wichtigste Exportgut Costa Ricas.","falsch"],
+ ["Der primäre Sektor beschäftigt anteilig mehr Menschen, als er zum BIP beiträgt.","richtig"],
+ ["Gut 9 von 10 exportierten Ananas gehen in nur zwei Märkte.","richtig"],
+ ["Die Produktion ist auf viele kleine Betriebe gleichmäßig verteilt.","falsch"],
+ ["Der Exportwert ist seit 2010 ohne Unterbrechung gestiegen.","falsch"]],
+ ["richtig","falsch"],
+ "Medizinprodukte liegen weit vorn (42 %). Der primäre Sektor hat ca. 11 % der Beschäftigten, aber nur ca. 4 % des BIP. USA und EU nehmen 94 %. Vier Firmen kontrollieren 71 %. 2019 sank der Exportwert.","AFB I/II")}
+${ordnen("wi3",3,"Bringe die Wirkungskette des Booms und der Krise in die richtige Reihenfolge.",[
+ "Del Monte entwickelt auf der Plantage Pindeco die süße, gut transportierbare Sorte MD-2; sie erobert die Märkte in den USA und Europa.",
+ "2003 endet der Sortenschutz: Viele neue Betriebe pflanzen MD-2, die Anbaufläche wächst stark.",
+ "Das Angebot auf dem Weltmarkt steigt schneller als die Nachfrage.",
+ "Die Preise fallen (Krise 2014/15), während die Produktionskosten steigen.",
+ "Viele kleine und mittlere Betriebe gehen pleite; 2018 kommen 71 % der Ernte von nur vier Firmen."],
+ "Diese Kette erklärt, warum Exportabhängigkeit und Preisschwankungen vor allem die Kleinen treffen.","AFB II")}
+${mc("wi4",3,"Was zeigen M10 und M11 zusammen über die Risiken des Sektors?",
+ ["Gar keine Risiken, weil der Exportwert insgesamt gestiegen ist.",
+  "Die Branche ist von zwei Märkten abhängig. Sinkt dort die Nachfrage oder drängen Konkurrenten (z. B. Mexiko, Kolumbien) auf den Markt, fallen Menge und Preis zugleich. Der Rückgang 2019 zeigt, wie schnell das geht.",
+  "Der Export in die USA ist verboten worden.",
+  "Ananas wird vor allem im Inland gegessen."],1,
+ "Exportabhängigkeit = Abhängigkeit von wenigen Gütern UND wenigen Abnehmern. Beide Seiten nennen.","AFB II")}
+${schreib("wi5",4,"<b>Klausurtraining:</b> Erläutere die wirtschaftliche Bedeutung des Ananasanbaus für Costa Rica (M8–M12).",
+ ["Allgemeine Lage: BIP/Kopf, Sektorenstruktur, Dienstleistungs- und Industrieland","Gewicht der Ananas: 6,4 % der Exporte, ca. 2 % des BIP, über 30 % des Agrar-BIP","Rolle als Devisenbringer und Weltmarktführer im Export","Arbeitsplätze, besonders im ländlichen Raum (30 000 direkt, 120 000 indirekt)","Abhängigkeit von USA und EU (94 %), Preisrisiken, Konkurrenz","Konzentration auf wenige Konzerne: wer profitiert?","Jede Aussage mit Materialbeleg (M…)"],
+ `<p>Costa Rica ist kein Agrarland mehr. Mit einem BIP pro Kopf von rund 17 900 US-$ und einem HDI von 0,833 gehört es zu den weiter entwickelten Ländern Lateinamerikas. Der Dienstleistungssektor erwirtschaftet etwa 69 % des BIP, der primäre Sektor nur etwa 4 %, beschäftigt aber rund 11 % der Erwerbstätigen (M8). Die Landwirtschaft ist also wenig produktiv, aber für viele Menschen wichtig.</p>
+<p>Die Ananas ist mit 6,4 % der Warenexporte nach Bananen das zweitwichtigste Agrarexportgut (M9). Sie brachte 2023 rund 1,2 Mrd. US-$ ein; der Exportwert hat sich seit 2010 fast verdoppelt (M11). Damit ist sie ein wichtiger Devisenbringer. Der Sektor trägt ca. 2 % zum BIP und über 30 % zum Agrar-BIP bei und sichert rund 30 000 direkte und 120 000 indirekte Arbeitsplätze, vor allem in der Nordzone und an der Karibik, wo es wenig andere Arbeit gibt (M8).</p>
+<p>Die Bedeutung hat Schattenseiten. 94 % der Exporte gehen in die USA und die EU (M10). Bricht dort die Nachfrage ein oder unterbieten Konkurrenten den Preis, trifft das den ganzen Sektor, wie der Rückgang des Exportwerts 2019 zeigt (M11). Zudem kontrollieren vier Konzerne 71 % der Produktion (M12). Ein großer Teil der Gewinne fließt an diese, oft ausländischen, Unternehmen und nicht an kleine Betriebe.</p>`,"AFB II",200)}
+`;
+
+SEITEN.umwelt = () => `
+<p class="lesen">Der Boom hat Folgen, die in keiner Exportstatistik stehen. Hier lernst du den Wasserfußabdruck zu lesen und Materialtexte auszuwerten.</p>
+<div class="diagramm" id="d-wasser"><h5>M13 Wasserfußabdruck ausgewählter Anbaufrüchte (m³ pro Tonne)</h5>
+<div class="umschalter" role="group" aria-label="Auswahl"><button class="an" data-m="klein" onclick="wasserUmschalten(this)">Früchte</button><button data-m="alle" onclick="wasserUmschalten(this)">mit Kaffee und Kakao</button></div>
+<div class="legende"><span style="--c:#2e7d55">grün: Regenwasser</span><span style="--c:#2b6ca3">blau: Bewässerung</span><span style="--c:#8a8478">grau: verschmutztes Wasser</span></div></div>
+<p class="quelle">Mekonnen, M. M. / Hoekstra, A. Y. (2011): The green, blue and grey water footprint of crops. Weltweite Durchschnittswerte 1996–2005.</p>
+${num("um1",1,"Eine Ananas wiegt etwa 1,5 kg. Wie viele Liter Wasser stecken im Durchschnitt in einer Frucht? (ganze Liter)",383,6,"Liter","255 m³ pro t = 255 000 Liter pro 1 000 kg = 255 Liter pro kg. 1,5 kg × 255 Liter = <b>rund 383 Liter</b>.","AFB I")}
+${mc("um2",2,"Was fällt beim Wasserfußabdruck der Ananas im Vergleich zur Banane auf?",
+ ["Die Ananas braucht mehr Bewässerungswasser.",
+  "Der gesamte Abdruck ist etwa dreimal kleiner (255 zu 790 m³/t); der blaue Anteil ist mit 9 m³/t (3,5 %) sehr gering, weil Ananas kaum bewässert wird.",
+  "Beide Früchte haben fast denselben Wasserfußabdruck.",
+  "Die Ananas hat den größten grauen Anteil aller Früchte."],1,
+ "Ananas ist durch ihre CAM-Fotosynthese sparsam. Für die Klausur heißt das: Ein kleiner Wasserfußabdruck bedeutet nicht automatisch geringe Wasserprobleme. Lies dazu M14.","AFB II")}
+<h3>Materialtexte</h3>
+<div class="raster">
+<div class="karte"><span class="mat">M14 Gift im Trinkwasser</span><p style="font-size:16px">In den Dörfern Milano, El Cairo, Luisiana und La Francia bei Siquirres (Karibikzone) liegen Ananasfelder bis dicht an die Brunnen. 2003 fand die Nationaluniversität im Trinkwasser die Herbizide Bromacil und Diuron sowie das Fungizid Triadimefon. 2007 erklärte das Gesundheitsministerium das Wasser für ungenießbar. Seitdem bringen Tankwagen Trinkwasser; 2016 war das immer noch so. 2017 verbot Costa Rica Bromacil. Das Gift baut sich im Grundwasser aber nur langsam ab.</p>
+<p class="quelle">Eigener Text nach La Nación, Tico Times, Oxfam (2016) und dem Verbotsdekret 2017.</p></div>
+<div class="karte"><span class="mat">M15 Wald und Weide werden Ananasfeld</span><p style="font-size:16px">Ein staatliches Satellitensystem (MOCUPP) vergleicht seit 2017 Luftbilder mit dem Grundbuch. Ergebnis: Zwischen 2000 und 2015 wurden 5 566 ha Wald zu Ananasfeldern, das sind rund 7 800 Fußballfelder. Ein Großteil der neuen Flächen war vorher Weideland. Weil die Daten öffentlich sind, können Käufer heute prüfen, ob eine Plantage auf entwaldetem Land liegt. Gleichzeitig gehört Costa Rica zu den Ländern mit dem höchsten Pestizideinsatz pro Hektar weltweit, je nach Berechnung 18 bis 34 kg Wirkstoff pro Jahr.</p>
+<p class="quelle">Eigener Text nach UNDP, CeNAT, FAO-Daten und IRET.</p></div>
+<div class="karte"><span class="mat">M16 Arbeit auf der Plantage</span><p style="font-size:16px">Der Sektor schafft Zehntausende Stellen, oft für Arbeitsmigrantinnen und -migranten aus Nicaragua. Hilfsorganisationen wie Oxfam berichten seit 2008 von niedrigen Löhnen, befristeten Verträgen, Behinderung von Gewerkschaften und Arbeit mit Pestiziden ohne ausreichenden Schutz. Ihr Fazit 2016: Nach acht Jahren hat sich wenig verbessert. Nur rund 3 % der Fläche werden ökologisch bewirtschaftet.</p>
+<p class="quelle">Eigener Text nach Oxfam „Süße Früchte, bittere Wahrheit“ (2016) und Fruitrop (2019).</p></div>
+<div class="karte"><span class="mat">M17 Fliegenplage</span><p style="font-size:16px">Nach der Ernte bleiben pro Hektar rund 26 t Pflanzenreste liegen. Darin vermehrt sich die Stallfliege massenhaft. Sie sticht Rinder auf benachbarten Weiden, die Tiere geben weniger Milch und nehmen ab. Viehhalter beschweren sich; das Landwirtschaftsministerium verhängt Strafen gegen Plantagen, die ihre Reste nicht richtig zerkleinern.</p>
+<p class="quelle">Eigener Text nach MAG/SFE Costa Rica und Universidad Nacional (UNA).</p></div>
+</div>
+<figure><img src="${BILDER.tankwagen}" alt="Tankwagen bringt Trinkwasser in ein Dorf" loading="lazy"><figcaption>Wenn Brunnen verseucht sind, kommt das Trinkwasser per Tankwagen. KI-generiertes, stilisiertes Bild.</figcaption></figure>
+${mc("um3",3,"M13 nennt für Ananas nur 31 m³/t graues Wasser. M14 beschreibt verseuchte Brunnen. Wie passt das zusammen?",
+ ["Gar nicht, eines der Materialien ist falsch.",
+  "M13 zeigt weltweite Durchschnittswerte aus einem Modell. Lokal, bei sehr hohem Pestizideinsatz und Feldern dicht an Brunnen, kann die Belastung viel höher sein. Ein Durchschnitt sagt wenig über den Einzelfall.",
+  "Graues Wasser hat mit Pestiziden nichts zu tun.",
+  "Die Dörfer liegen nicht im Anbaugebiet."],1,
+ "Material kritisch vergleichen ist AFB III. Solche Hinweise heben eine Klausur deutlich an.","AFB II/III")}
+${zuordnen("um4",2,"Welches Material belegt die Aussage?",[
+ ["Der Ananasanbau gefährdet die Trinkwasserversorgung.","M14"],
+ ["Für den Ananasanbau wurden Waldflächen gerodet.","M15"],
+ ["Die Ausweitung der Plantagen schadet anderen Landnutzern in der Nachbarschaft.","M17"],
+ ["Beschäftigte tragen gesundheitliche Risiken.","M16"],
+ ["Der Staat hat begonnen, gegenzusteuern.","M15"]],
+ ["M14","M15","M16","M17"],
+ "Für die letzte Aussage passen auch M14 (Bromacil-Verbot) und M17 (Strafen). In der Klausur darfst du mehrere Belege nennen.","AFB I")}
+${schreib("um5",4,"<b>Klausurtraining:</b> Erkläre, warum der Ananasanbau trotz kleinem Wasserfußabdruck zu Wasserproblemen führt (M13, M14, M15).",
+ ["Kleiner Gesamt- und Blauwasser-Abdruck mit Zahlen","Hoher Pestizideinsatz pro Hektar als Ursache","Auswaschung ins Grundwasser, Felder nahe an Brunnen","Folge: Trinkwasser ungenießbar, Tankwagen seit 2007","Kritik an Durchschnittswerten (Modell vs. Einzelfall)"],
+ `<p>Die Ananas ist eine sparsame Pflanze. Weltweit liegt ihr Wasserfußabdruck bei nur 255 m³/t, davon sind lediglich 9 m³ Bewässerungswasser (M13). Wasserprobleme entstehen in Costa Rica daher nicht durch Entnahme, sondern durch Verschmutzung.</p>
+<p>Weil Monokulturen anfällig für Unkraut, Schädlinge und Pilze sind, werden pro Hektar sehr viele Pestizide ausgebracht (M15). Bei Niederschlägen von über 1 700 mm im Jahr werden die Wirkstoffe in den Boden und ins Grundwasser gespült. Liegen Felder dicht an Brunnen, gelangen sie ins Trinkwasser. In Dörfern bei Siquirres fand man Bromacil und Diuron; seit 2007 kommt dort das Trinkwasser per Tankwagen (M14).</p>
+<p>Der niedrige graue Wert in M13 ist ein weltweiter Durchschnitt. Er zeigt nicht, wie hoch die Belastung an einzelnen Orten mit besonders intensivem Anbau ist.</p>`,"AFB II")}
+`;
+
+SEITEN.beurteilen = () => {
+  const S=[
+   ["Der Exportwert stieg von 0,68 Mrd. US-$ (2010) auf 1,18 Mrd. US-$ (2023).","Ökonomie","+"],
+   ["94 % der Exporte gehen in nur zwei Märkte; Preiskrisen wie 2014/15 treffen den ganzen Sektor.","Ökonomie","−"],
+   ["Vier Konzerne kontrollieren 71 % der Produktion; Gewinne fließen oft ins Ausland.","Ökonomie","−"],
+   ["Der Sektor schafft ca. 30 000 direkte und 120 000 indirekte Arbeitsplätze im ländlichen Raum.","Soziales","+"],
+   ["Dörfer bei Siquirres sind seit 2007 auf Trinkwasser aus Tankwagen angewiesen.","Soziales","−"],
+   ["Beschäftigte berichten von niedrigen Löhnen, Pestizidkontakt und Behinderung von Gewerkschaften.","Soziales","−"],
+   ["Zwischen 2000 und 2015 wurden 5 566 ha Wald in Ananasfelder umgewandelt.","Ökologie","−"],
+   ["Bromacil und Diuron wurden im Grundwasser nachgewiesen.","Ökologie","−"],
+   ["Ananas braucht kaum Bewässerung; ihr blauer Wasserfußabdruck ist sehr klein.","Ökologie","+"],
+   ["Ein Satellitensystem macht Entwaldung sichtbar; Käufer können entwaldungsfreie Ware verlangen.","Ökologie","+"],
+   ["Pflanzenreste fördern eine Stallfliegenplage, die Viehhalter in der Nachbarschaft schädigt.","Ökonomie","−"],
+   ["Der Sektor ist Weltmarktführer, das Land verdient Devisen für Importe.","Ökonomie","+"]
+  ];
+  reg("nh1");
+  return `<p class="lesen">Beim Beurteilen wägst du ab. Das Dreieck der Nachhaltigkeit gibt dir drei Prüffragen vor. Erst sammeln, dann gewichten, dann urteilen.</p>
+<div class="dreieck-wrap">
+<div class="karte" style="margin:0"><svg viewBox="0 0 300 270" id="dreieck" role="img" aria-label="Dreieck der Nachhaltigkeit">
+<polygon points="150,18 282,250 18,250" fill="#e3efe6" stroke="#1f5a3d" stroke-width="3"/>
+<text x="150" y="12" text-anchor="middle" font-family="sans-serif" font-size="14" font-weight="700" fill="#1f5a3d">Ökologie</text>
+<text x="285" y="268" text-anchor="end" font-family="sans-serif" font-size="14" font-weight="700" fill="#1f5a3d">Ökonomie</text>
+<text x="15" y="268" font-family="sans-serif" font-size="14" font-weight="700" fill="#1f5a3d">Soziales</text>
+<g id="dz-oek" transform="translate(150,90)"></g><g id="dz-wir" transform="translate(212,205)"></g><g id="dz-soz" transform="translate(88,205)"></g>
+<text x="150" y="160" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#4a463e">Zukunfts-</text><text x="150" y="175" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#4a463e">fähig?</text>
+</svg><p class="hinweis" style="margin:4px 0 0">Die Zahlen zeigen, wie viele Argumente du richtig einsortiert hast (+ / −).</p></div>
+<div class="box blau" style="margin:0"><h4>Drei Prüffragen</h4>
+<ul><li><b>Ökologie:</b> Bleiben Boden, Wasser, Wald und Artenvielfalt erhalten?</li>
+<li><b>Ökonomie:</b> Ist der Anbau dauerhaft rentabel und krisenfest? Wer profitiert?</li>
+<li><b>Soziales:</b> Verbessert er Lebens- und Arbeitsbedingungen, Gesundheit, Mitsprache der Menschen vor Ort?</li></ul>
+<p><b>Gewichten:</b> Was wiegt schwerer, was ist umkehrbar, was nicht? Verlorener Wald und vergiftetes Grundwasser lassen sich kaum rückgängig machen, Preisrisiken eher.</p></div>
+</div>
+<div class="ueb" data-ueb="nh1">${kopf(2,"AFB II")}<div class="frage">Sortiere jedes Argument: Zu welcher Dimension gehört es, und spricht es für (+) oder gegen (−) die Zukunftsfähigkeit?</div>
+<div class="zuordnen" id="nh-liste">${S.map((s,i)=>`<div class="karte-satz" data-d="${s[1]}" data-p="${s[2]}"><span>${s[0]}</span><span class="sel"><select aria-label="Dimension"><option value="">Dimension …</option><option>Ökologie</option><option>Ökonomie</option><option>Soziales</option></select><select aria-label="Wirkung"><option value="">+ / − …</option><option value="+">+ spricht dafür</option><option value="−">− spricht dagegen</option></select></span></div>`).join("")}</div>
+<div class="zeile" style="margin-top:10px"><button class="knopf" onclick="nhPruef()">Prüfen</button></div>
+<div class="rueck" id="r-nh1"></div></div>
+${mc("nh2",3,"Welcher Fazit-Satz ist am besten begründet?",
+ ["Der Ananasanbau ist schlecht.",
+  "Der Ananasanbau ist ökonomisch erfolgreich, deshalb ist er zukunftsfähig.",
+  "Der Ananasanbau bringt Devisen und Arbeit, ist aber nur eingeschränkt zukunftsfähig: Die ökologischen Schäden (Entwaldung, Grundwasser) sind teils nicht umkehrbar, und die Abhängigkeit von zwei Märkten und vier Konzernen macht auch den wirtschaftlichen Nutzen unsicher. Zukunftsfähig wäre er nur mit strengeren Pestizidregeln, Kontrolle der Flächen und faireren Arbeitsbedingungen.",
+  "Weil Ananas lecker sind, sollte man sie weiter kaufen."],2,
+ "Ein gutes Fazit nimmt alle drei Dimensionen auf, gewichtet sie und nennt Bedingungen.","AFB III")}
+${mc("nh3",3,"Welche Perspektive fehlt oft in Klausuren und bringt Zusatzpunkte?",
+ ["Die Frage, ob Ananas gesund ist.",
+  "Zeit und Akteure: kurzfristig vs. langfristig, und wer gewinnt (Konzerne, Staat) bzw. wer verliert (Dörfer, Kleinbetriebe, Natur)?",
+  "Die Farbe der Ananas.",
+  "Wie viele Ananas man in Deutschland isst."],1,
+ "Unterscheide Zeiträume und Betroffene. So wird das Urteil differenziert.","AFB III")}
+${schreib("nh4",4,"<b>Klausurtraining:</b> Beurteile die Zukunftsfähigkeit des Ananasanbaus in Costa Rica anhand des Dreiecks der Nachhaltigkeit.",
+ ["Kriterium genannt: Dreieck der Nachhaltigkeit mit drei Dimensionen","Ökonomie: + (Devisen, Weltmarktführer, Arbeit) und − (Abhängigkeit, Preise, Konzentration)","Ökologie: − (Entwaldung, Pestizide, Grundwasser, Fliegen) und + (wenig Bewässerung, MOCUPP, Bromacil-Verbot)","Soziales: + (Einkommen, Jobs) und − (Trinkwasser, Arbeitsbedingungen, Gesundheit)","Gewichtung: was wiegt schwerer und warum (z. B. Umkehrbarkeit)","Begründetes Fazit mit Bedingungen","Materialbelege durchgängig"],
+ `<p><b>Einleitung:</b> Zukunftsfähig ist der Anbau, wenn er ökologisch, ökonomisch und sozial dauerhaft tragfähig ist (Dreieck der Nachhaltigkeit).</p>
+<p><b>Ökonomisch</b> spricht viel für den Anbau. Costa Rica ist Weltmarktführer im Export; der Exportwert stieg auf rund 1,2 Mrd. US-$ (M11). Die Ananas bringt Devisen und 6,4 % der Exporterlöse (M9). Dagegen stehen hohe Risiken: 94 % gehen in die USA und die EU (M10), Preiskrisen haben viele kleine Betriebe aus dem Markt gedrängt, und vier Konzerne kontrollieren 71 % (M12). Der Nutzen ist also ungleich verteilt und krisenanfällig.</p>
+<p><b>Ökologisch</b> überwiegen die Nachteile. Für Felder wurden 5 566 ha Wald gerodet (M15). Der Pestizideinsatz gehört zu den höchsten der Welt; Herbizide gelangten ins Grundwasser (M14, M15). Positiv ist, dass Ananas kaum Bewässerung braucht (M13) und der Staat mit dem Satellitensystem MOCUPP und dem Bromacil-Verbot gegensteuert.</p>
+<p><b>Sozial</b> schafft der Sektor zehntausende Arbeitsplätze im ländlichen Raum (M8). Zugleich leiden Beschäftigte unter niedrigen Löhnen und Pestizidkontakt (M16), und ganze Dörfer sind seit Jahren auf Tankwagen angewiesen (M14). Auch Viehhalter tragen Kosten (M17).</p>
+<p><b>Fazit:</b> Kurzfristig ist der Ananasanbau wirtschaftlich erfolgreich. Langfristig ist er nur eingeschränkt zukunftsfähig, weil die ökologischen Schäden teils nicht umkehrbar sind und die sozialen Kosten bei den Menschen vor Ort anfallen, während die Gewinne bei wenigen Konzernen liegen. Zukunftsfähiger würde er durch strenge Abstände zu Brunnen, weniger Pestizide, entwaldungsfreie Lieferketten, mehr ökologischen Anbau und faire Arbeitsbedingungen, die Käufer in den USA und Europa einfordern können.</p>`,"AFB III",240)}
+`;};
+
+function nhPruef(){
+  const ks=[...document.querySelectorAll("#nh-liste .karte-satz")];let ok=0;const z={Ökologie:[0,0],Ökonomie:[0,0],Soziales:[0,0]};
+  ks.forEach(k=>{const [d,p]=[...k.querySelectorAll("select")].map(s=>s.value);const r=d===k.dataset.d&&p===k.dataset.p;k.classList.toggle("richtig",r);k.classList.toggle("falsch",!r);if(r){ok++;z[d][p==="+"?0:1]++;}});
+  const set=(id,a)=>{const g=document.getElementById(id);g.innerHTML=`<text text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="700"><tspan fill="#2e7d55">+${a[0]}</tspan><tspan fill="#b5402f" dx="8">−${a[1]}</tspan></text>`;};
+  set("dz-oek",z.Ökologie);set("dz-wir",z.Ökonomie);set("dz-soz",z.Soziales);
+  const r=document.getElementById("r-nh1");
+  if(ok===ks.length){r.className="rueck zeigen ok";r.innerHTML="Alles richtig. Sieh dir das Dreieck an: In der Ökologie und im Sozialen überwiegen die Minuspunkte. Das ist die Grundlage für dein Fazit. Hinweis: Die Fliegenplage kann man auch der Ökologie zuordnen; hier zählt der wirtschaftliche Schaden der Viehhalter.";markiere("nh1");}
+  else{r.className="rueck zeigen no";r.textContent=`${ok} von ${ks.length} richtig. Prüfe die rot markierten Karten: Stimmt die Dimension oder die Richtung nicht?`;}
+}
+
+SEITEN.probeklausur = () => {
+  const zeit=lade("timer",null);
+  return `<div class="timer"><button class="knopf leise" onclick="timerStart()">135 min starten</button><button class="knopf leise" onclick="timerStop()">Stopp</button><span class="uhr" id="uhr">135:00</span></div>
+<p class="lesen">Schreibe die Klausur wie im Ernstfall: Uhr starten, Handy weg, nur mit den Materialien dieser Seite. Danach vergleichst du mit dem Erwartungshorizont und zählst deine Punkte.</p>
+<div class="karte" style="border-width:2px;border-color:var(--gruen)">
+<h3 style="margin-top:0">Ananas aus Costa Rica: süßes Geschäft mit bitterem Beigeschmack?</h3>
+<p><b>Aufgabe 1</b> (27 Punkte)<br>Ordnen Sie die Anbaugebiete für Ananas in Costa Rica geographisch ein und beschreiben Sie die Entwicklung des Ananasanbaus seit 2000.</p>
+<p><b>Aufgabe 2</b> (38 Punkte)<br>Erläutern Sie die wirtschaftliche Bedeutung des Ananasanbaus für Costa Rica.</p>
+<p><b>Aufgabe 3</b> (35 Punkte)<br>Beurteilen Sie die Zukunftsfähigkeit des Ananasanbaus in Costa Rica anhand des Dreiecks der Nachhaltigkeit.</p>
+<p class="hinweis">Materialien: M1 Karte · M2 Steckbrief · M3 Klimadiagramm Los Chiles · M5 Produktion · M6 Fläche · M7 Weltvergleich · M8 Länderdaten · M9 Exportstruktur · M10 Abnehmer · M11 Exportwert · M12 Produzenten · M13 Wasserfußabdruck · M14–M17 Texte. Alle stehen unten noch einmal.</p></div>
+<h3>Deine Antworten</h3>
+${[1,2,3].map(n=>`<h4>Aufgabe ${n}</h4><textarea id="pk-${n}" style="min-height:260px" oninput="sichere('pk-${n}',this.value)" placeholder="Deine Lösung zu Aufgabe ${n}">${lade("pk-"+n,"").replace(/</g,"&lt;")}</textarea>`).join("")}
+<div class="zeile" style="margin-top:12px"><button class="knopf leise" onclick="window.print()">Drucken / als PDF sichern</button></div>
+
+<h3>Materialien</h3>
+<div class="diagramm" style="padding:8px"><h5 style="margin:4px 6px 8px">M1 Costa Rica: Relief, Gradnetz und Anbauzonen</h5><div id="karte2"></div><div class="koord" id="karte2-koord"></div></div>
+<div class="raster"><div class="diagramm" id="pk-kd"><h5>M3 Klimadiagramm Los Chiles</h5></div><div class="diagramm" id="pk-prod"><h5>M5 Produktion (Mio. t)</h5></div></div>
+<div class="raster"><div class="diagramm" id="pk-fl"><h5>M6 Fläche (1 000 ha)</h5></div><div class="diagramm" id="pk-welt"><h5>M7 Größte Produzenten 2022 (Mio. t)</h5></div></div>
+<div class="raster"><div class="diagramm" id="pk-exp"><h5>M9 Exportstruktur 2023 (%)</h5></div><div class="diagramm" id="pk-abn"><h5>M10 Abnehmer 2017</h5></div></div>
+<div class="raster"><div class="diagramm" id="pk-wert"><h5>M11 Exportwert (Mio. US-$)</h5></div><div class="diagramm" id="pk-firm"><h5>M12 Produzenten 2017 (%)</h5></div></div>
+<p class="hinweis">M2, M8 und M13–M17 findest du in den Stufen <a href="#klima">4</a>, <a href="#wirtschaft">6</a> und <a href="#umwelt">7</a>. Öffne sie in einem zweiten Tab.</p>
+
+<h3>Erwartungshorizont</h3>
+<p class="lesen">Erst aufklappen, wenn du fertig bist. Der Horizont ist umfangreicher als eine Schülerlösung sein muss. Hake ab, was du sinngemäß geschrieben hast.</p>
+${ewBlock(1,"AFB I/II · M1, M2, M3, M5, M6, M7, M8",[
+ ["Anbauzonen benannt: Nordzone (56 %), Karibikzone (25 %), Pazifikzone (19 %)",3],
+ ["Verortung: Mittelamerika, Nachbarn Nicaragua/Panama, Karibik und Pazifik, ca. 8°–11° N und 82°30′–86° W; Nordzone ca. 10°30′–11° N, 84°–85° W; Puerto Limón als Exporthafen",6],
+ ["Eignung: Klima Los Chiles (26,8 °C, 1 720 mm, kurze Trockenzeit Feb.–Apr. ohne Monat unter 15 mm), Abgleich mit M2; Relief: Tiefland vor der Vulkan- und Gebirgskette; Boden: locker und sauer als Anspruch; Fazit: gut geeignet, Bewässerung kaum nötig, Entwässerung nötig",13],
+ ["Entwicklung: Produktion 0,9 → 2,9 Mio. t (mehr als verdreifacht), Höchstwert 2018 mit 3,4 Mio. t, Rückgang bis 2020; Fläche ca. 11 000 → 44 500 ha (Satellit: über 66 000 ha); Platz 3 weltweit, ca. 10 %",5]])}
+${ewBlock(2,"AFB II · M7–M12, M16",[
+ ["Allgemeine Lage: BIP/Kopf ca. 17 900 US-$, HDI 0,833, Dienstleistungs- und Industrieland",2],
+ ["Gewicht der Ananas: 6,4 % der Exporte, zweitwichtigstes Agrarexportgut, ca. 2 % des BIP, über 30 % des Agrar-BIP; primärer Sektor beschäftigt mehr Menschen als sein BIP-Anteil",12],
+ ["Hauptabnehmer USA und EU (94 %), Costa Rica liefert 84 % der US-Ananasimporte; Bedeutung dieser Märkte; Konkurrenz durch Mexiko, Kolumbien",8],
+ ["Exportwert 0,68 → 1,18 Mrd. US-$, aber Rückgang 2019 und Preiskrise 2014/15, steigende Kosten → Anreiz zur Ausweitung, aber Risiko",7],
+ ["Konzentration: vier Firmen 71 %, Gewinne teils bei ausländischen Konzernen; Kleinbetriebe verdrängt",5],
+ ["Arbeitsplätze: ca. 30 000 direkt, 120 000 indirekt, im ländlichen Raum; Arbeitsmigration aus Nicaragua",4]])}
+${ewBlock(3,"AFB II/III · M8–M17",[
+ ["Ökonomie: + Devisen, Weltmarktführer, Wachstum des Exportwerts; − Exportabhängigkeit (zwei Märkte, ein Produkt), Preiskrisen, Konzentration, Schäden für Viehhalter",9],
+ ["Ökologie: − Entwaldung 5 566 ha, Pestizideinsatz 18–34 kg/ha, Grundwasserbelastung, Monokultur, Fliegenplage; + kaum Bewässerung, geringer blauer Wasserfußabdruck, MOCUPP, Bromacil-Verbot; Kritik am Durchschnittswert des grauen Wassers",14],
+ ["Soziales: + Einkommen, Arbeitsplätze; − Trinkwasser per Tankwagen seit 2007, Gesundheitsrisiken, niedrige Löhne, Behinderung von Gewerkschaften; Landkonzentration",7],
+ ["Fazit: Abwägung mit Gewichtung (Umkehrbarkeit, Verteilung von Nutzen und Kosten, kurz- vs. langfristig); Zukunftsfähigkeit nur eingeschränkt bzw. unter Bedingungen",5]])}
+<div class="karte"><p class="punkte" id="pk-summe">Deine Punkte: 0 von 100</p>
+<table><tr><th>Punkte</th><td>100–95</td><td>94–85</td><td>84–75</td><td>74–65</td><td>64–55</td><td>54–45</td><td>44–39</td><td>38–33</td><td>32–27</td><td>26–20</td><td>19–0</td></tr>
+<tr><th>Note</th><td>1+ bis 1</td><td>1− / 2+</td><td>2 / 2−</td><td>3+ / 3</td><td>3− / 4+</td><td>4</td><td>4−</td><td>5+</td><td>5</td><td>5−</td><td>6</td></tr></table>
+<p class="hinweis">Grobe Orientierung nach der üblichen NRW-Notentabelle der Oberstufe; die Darstellungsleistung ist hier nicht enthalten.</p></div>`;};
+
+function ewBlock(n,kopfz,zeilen){
+  const max=zeilen.reduce((a,z)=>a+z[1],0);
+  return `<details class="loesung"><summary>Aufgabe ${n} (${max} Punkte) · ${kopfz}</summary>
+  <table class="ew"><tr><th>Erwartung</th><th>Punkte</th><th>✓</th></tr>
+  ${zeilen.map((z,i)=>`<tr><td>${z[0]}</td><td class="z">${z[1]}</td><td><input type="number" min="0" max="${z[1]}" value="${lade(`ew-${n}-${i}`,"")}" style="width:64px" aria-label="erreichte Punkte" oninput="sichere('ew-${n}-${i}',this.value);ewSumme()"></td></tr>`).join("")}
+  </table><p class="hinweis">Trage deine Punkte selbst ein (höchstens die Maximalpunktzahl).</p></details>`;
+}
+function ewSumme(){let s=0;document.querySelectorAll(".ew input").forEach(i=>{const v=Math.min(+i.max,Math.max(0,+i.value||0));s+=v;});const e=document.getElementById("pk-summe");if(e)e.textContent=`Deine Punkte: ${s} von 100`;if(s>=50)markiere("pk");}
+let timerId=null;
+function timerStart(){const ende=Date.now()+135*60000;sichere("timer",ende);timerLauf();}
+function timerStop(){sichere("timer",null);clearInterval(timerId);const u=document.getElementById("uhr");if(u)u.textContent="135:00";}
+function timerLauf(){clearInterval(timerId);const ende=lade("timer",null);if(!ende)return;const tick=()=>{const u=document.getElementById("uhr");if(!u){clearInterval(timerId);return;}const r=Math.max(0,ende-Date.now());const m=Math.floor(r/60000),s=Math.floor(r%60000/1000);u.textContent=`${m}:${String(s).padStart(2,"0")}`;if(r===0){clearInterval(timerId);u.textContent="Zeit ist um";}};tick();timerId=setInterval(tick,1000);}
+
+SEITEN.quellen = () => `
+<h3 style="margin-top:0">Zahlen und Texte</h3>
+<ul class="lesen" style="font-size:16px">
+<li>FAOSTAT: Produktion von Ananas nach Ländern, abgerufen über die Wikipedia-Liste „List of countries by pineapple production“ (Stand 27.03.2024).</li>
+<li>Dawson, C. (2019): The pineapple in Costa Rica. Fruitrop Nr. 262, CIRAD, S. 50–55 (Flächen, Zonen, Firmenanteile, Exporte, Häfen, Beschäftigte).</li>
+<li>PROCOMER (Promotora del Comercio Exterior de Costa Rica): Exportstatistik 2023, Exportziele 2025.</li>
+<li>Exportwerte HS 080430 nach UN Comtrade, zusammengestellt von Tridge und anderen Datenportalen (gerundet).</li>
+<li>Instituto Meteorológico Nacional Costa Rica: Klimadaten Los Chiles (1995–2015) und Liberia, über Wikipedia.</li>
+<li>Mekonnen, M. M. / Hoekstra, A. Y. (2011): The green, blue and grey water footprint of crops and derived crop products. Hydrology and Earth System Sciences 15, S. 1577–1600.</li>
+<li>Oxfam Deutschland (2016): Süße Früchte, bittere Wahrheit.</li>
+<li>UNDP Costa Rica / CeNAT: MOCUPP, Monitoring von Landnutzungsänderungen (2017).</li>
+<li>La Nación, Tico Times; Dekret zum Bromacil-Verbot (2017); IRET/Universidad Nacional zu Pestiziden.</li>
+<li>WKO-Länderprofil Costa Rica, UNDP Human Development Report (HDI 2023).</li></ul>
+<div class="box gold"><h4>Hinweis zur Genauigkeit</h4><p>Viele Werte sind gerundet. Je nach Quelle weichen Zahlen voneinander ab, besonders bei der Anbaufläche und beim Pestizideinsatz. Darauf weist die Seite an den betreffenden Stellen hin.</p></div>
+<h3>Bilder</h3>
+<p class="lesen">Die Fotos auf dieser Seite sind <b>KI-generiert</b> (Higgsfield, Modell Soul Cinematic) und dienen nur der Stimmung. Sie zeigen keine echten Orte oder Personen. Alle Diagramme sind aus den genannten Daten selbst gezeichnet. Die Karte stammt von OpenTopoMap (CC-BY-SA) auf Basis von OpenStreetMap.</p>
+<h3>Zum Weiterlesen</h3>
+<ul class="lesen" style="font-size:16px">
+<li><a href="https://www.oxfam.de/system/files/20150530-oxfam-suesse-fruechte-bittere-wahrheit.pdf" target="_blank" rel="noopener">Oxfam: Süße Früchte, bittere Wahrheit (PDF)</a></li>
+<li><a href="https://www.undp.org/facs/news/news-buyers-can-now-guarantee-sustainable-pineapples-costa-rica" target="_blank" rel="noopener">UNDP: Monitoring entwaldungsfreier Ananas (englisch)</a></li>
+<li><a href="https://www.waterfootprint.org/" target="_blank" rel="noopener">Water Footprint Network (englisch)</a></li></ul>
+<p class="hinweis">Klausurtraining Erdkunde: Cash Crops in den Tropen am Beispiel Ananas. Paul-Klee-Gymnasium Overath.</p>
+<p><button class="knopf leise" onclick="if(confirm('Wirklich alle Antworten und den Fortschritt in diesem Browser löschen?')){Object.keys(localStorage).filter(k=>k.startsWith(SPEICHER)).forEach(k=>localStorage.removeItem(k));location.hash='#start';location.reload();}">Fortschritt zurücksetzen</button></p>`;
+
+/* ============ Weg der Ananas (Animation) ============ */
+function wegBauen(el){
+  const st=[["🌱","Feld","Pflanzung, nach 14–18 Monaten Ernte von Hand"],["🏭","Packstation","waschen, wachsen, sortieren, in Kartons packen"],["🚚","Lkw","Kühltransport zum Hafen, wenige Stunden"],["⚓","Puerto Limón","90 % der Exporte, Kühlcontainer"],["🚢","Schiff","12–15 Tage nach Houston, 14–20 Tage nach Nordeuropa"],["🛒","Supermarkt","Reifeprüfung, Verteilung an Märkte"]];
+  const W=900,H=170;const svg=svgEl("svg",{viewBox:`0 0 ${W} ${H}`,role:"img","aria-label":"Weg der Ananas vom Feld zum Supermarkt"});
+  const y=60;svgEl("path",{d:`M60 ${y} C 250 ${y-40}, 400 ${y+40}, 520 ${y} S 760 ${y-30}, 840 ${y}`,fill:"none",stroke:"#d9a21b","stroke-width":4,"stroke-dasharray":"8 8",id:"wegpfad"},svg);
+  st.forEach((s,i)=>{const x=60+i*156;const g=svgEl("g",{},svg);svgEl("circle",{cx:x,cy:y,r:26,fill:"#fffdf8",stroke:"#1f5a3d","stroke-width":2.5},g);
+    const t=svgEl("text",{x,y:y+8,"text-anchor":"middle","font-size":22},g);t.textContent=s[0];
+    svgEl("text",{x,y:y+50,"text-anchor":"middle","font-size":14,"font-weight":700},g).textContent=s[1];
+    const lines=s[2].match(/.{1,24}(\s|$)/g)||[s[2]];lines.forEach((l,j)=>{svgEl("text",{x,y:y+68+j*15,"text-anchor":"middle","font-size":11.5,fill:"#6b665c"},g).textContent=l.trim();});});
+  const ball=svgEl("text",{"font-size":24},svg);ball.textContent="🍍";
+  const p=svg.querySelector("#wegpfad");el.appendChild(svg);
+  let t0=null;const len=p.getTotalLength();
+  function anim(ts){if(!document.body.contains(svg))return;if(!t0)t0=ts;const f=((ts-t0)/9000)%1;const pt=p.getPointAtLength(f*len);ball.setAttribute("x",pt.x-12);ball.setAttribute("y",pt.y-14);requestAnimationFrame(anim);}
+  if(!matchMedia("(prefers-reduced-motion: reduce)").matches)requestAnimationFrame(anim);else{ball.setAttribute("x",48);ball.setAttribute("y",y-30);}
+}
+
+/* ============ Nach dem Rendern: Diagramme etc. ============ */
+function wasserUmschalten(b){b.parentNode.querySelectorAll("button").forEach(x=>x.classList.toggle("an",x===b));wasserDiagramm(document.getElementById("d-wasser"),b.dataset.m);}
+const mioT=v=>fmt(v/1e6,1);
+function prodChart(id){linien(document.getElementById(id),{daten:D.produktion,yMax:3500000,ySchritte:7,fmtY:v=>fmt(v/1e6,1),fmtTip:v=>fmt(v/1e6,2)+" Mio. t",farbe:"#1f5a3d",xTicks:[1990,1995,2000,2005,2010,2015,2020],xMin:1990,xMax:2022,flaeche:true,label:"Ananasproduktion Costa Rica"});}
+function flChart(id){linien(document.getElementById(id),{daten:D.flaeche,yMax:50000,ySchritte:5,fmtY:v=>fmt(v/1000),fmtTip:v=>fmt(v)+" ha",farbe:"#b8860b",xTicks:[2000,2006,2012,2018],xMin:2000,xMax:2018,flaeche:true,label:"Anbaufläche"});}
+function weltChart(id){balken(document.getElementById(id),{daten:D.laender2022.map(d=>[d[0],d[1]]),max:3400000,fmt:v=>fmt(v/1e6,2),hervor:"Costa Rica",L:110,label:"Größte Produzenten"});}
+function expChart(id){balken(document.getElementById(id),{daten:D.exporte,max:45,fmt:v=>fmt(v,1)+" %",hervor:"Ananas",L:150,label:"Exportstruktur"});}
+function wertChart(id){linien(document.getElementById(id),{daten:D.exportwert,yMax:1400,ySchritte:7,fmtY:v=>fmt(v),fmtTip:v=>fmt(v)+" Mio. US-$",farbe:"#2b6ca3",xTicks:[2010,2014,2018,2022],xMin:2010,xMax:2023,label:"Exportwert"});}
+function firmChart(id){balken(document.getElementById(id),{daten:D.firmen,max:42,fmt:v=>v+" %",L:170,label:"Marktanteile"});}
+
+const NACH = {
+  verorten(){const m=karteBauen("karte",{quiz:true});karteQuiz(m);},
+  klima(){klimadiagramm(document.getElementById("kd1"),D.losChiles);klimadiagramm(document.getElementById("kd2"),D.liberia);},
+  statistik(){prodChart("d-prod");flChart("d-flaeche");weltChart("d-welt");},
+  wirtschaft(){expChart("d-exporte");donut(document.getElementById("d-abnehmer"),D.abnehmer,"Abnehmer");wertChart("d-wert");firmChart("d-firmen");wegBauen(document.getElementById("weg"));},
+  umwelt(){wasserDiagramm(document.getElementById("d-wasser"),"klein");},
+  probeklausur(){karteBauen("karte2",{});klimadiagramm(document.getElementById("pk-kd"),D.losChiles);prodChart("pk-prod");flChart("pk-fl");weltChart("pk-welt");expChart("pk-exp");donut(document.getElementById("pk-abn"),D.abnehmer,"Abnehmer");wertChart("pk-wert");firmChart("pk-firm");ewSumme();timerLauf();}
+};
+
+/* ============ Router ============ */
+function zeige(id){
+  const t=THEMEN.find(x=>x.id===id)||THEMEN[0];aktuellesThema=t.id;sichere("letztes",t.id);
+  const i=THEMEN.indexOf(t);const vor=THEMEN[i-1],nach=THEMEN[i+1];
+  const main=document.getElementById("main");
+  main.innerHTML=`<header class="kopf" style="background-image:url('${BILDER[t.bild]}')"><div class="inhalt"><span class="stufe">${t.stufe}</span><h2>${t.titel}</h2><p>${t.unter}</p></div><span class="ki">Foto KI-generiert, stilisiert</span></header>
+  <div class="seite">${SEITEN[t.id]()}
+  <div class="navknoepfe">${vor?`<a class="knopf leise" href="#${vor.id}" style="text-decoration:none">← ${vor.titel}</a>`:"<span></span>"}${nach?`<a class="knopf" href="#${nach.id}" style="text-decoration:none">${nach.titel} →</a>`:""}</div></div>`;
+  if(NACH[t.id])NACH[t.id]();
+  document.querySelectorAll("[data-ueb]").forEach(e=>{if(erledigt[e.dataset.ueb])e.classList.add("fertig");});
+  document.querySelectorAll("nav a").forEach(a=>a.classList.toggle("aktiv",a.getAttribute("href")==="#"+t.id));
+  document.querySelector("aside").classList.remove("offen");
+  window.scrollTo(0,0);zaehle();
+}
+function zaehle(){
+  let ges=0,ok=0;
+  THEMEN.forEach(t=>{const ids=ALLE_UEB[t.id]||[];const n=ids.filter(x=>erledigt[x]).length;ges+=ids.length;ok+=n;
+    document.querySelectorAll(`[data-zaehler="${t.id}"]`).forEach(z=>z.textContent=ids.length?`${n}/${ids.length}`:"");});
+  document.getElementById("gesamtText").textContent=`${ok} von ${ges} Aufgaben gelöst`;
+  document.getElementById("gesamtBalken").style.width=(ges?ok/ges*100:0)+"%";
+}
+function init(){
+  // Alle Seiten einmal „trocken“ rendern, um die Übungen zu zählen
+  THEMEN.forEach(t=>{aktuellesThema=t.id;SEITEN[t.id]();});
+  for(const id in UEB){(ALLE_UEB[UEB[id]]=ALLE_UEB[UEB[id]]||[]).push(id);}
+  let gruppe="";
+  document.getElementById("navliste").innerHTML=THEMEN.map(t=>{let g="";if(t.gruppe!==gruppe){gruppe=t.gruppe;g=`<li class="gruppe">${gruppe}</li>`;}
+    return g+`<li><a href="#${t.id}"><span class="nr">${t.nr}</span><span>${t.titel}</span><span class="zaehler" data-zaehler="${t.id}"></span></a></li>`;}).join("");
+  window.addEventListener("hashchange",()=>zeige(location.hash.slice(1)));
+  document.addEventListener("keydown",e=>{if(e.target.matches("input,textarea,select"))return;const i=THEMEN.findIndex(t=>t.id===aktuellesThema);
+    if(e.key==="ArrowRight"&&THEMEN[i+1])location.hash=THEMEN[i+1].id;if(e.key==="ArrowLeft"&&THEMEN[i-1])location.hash=THEMEN[i-1].id;});
+  zeige(location.hash.slice(1)||lade("letztes","start"));
+}
+init();
+</script>
+</body>
+</html>
